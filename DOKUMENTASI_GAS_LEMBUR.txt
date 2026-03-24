@@ -1,0 +1,272 @@
+# DOKUMENTASI APLIKASI GAS-LEMBUR
+
+================================================================================
+BAGIAN 1: TASK CHECKLIST (DAFTAR TUGAS & FITUR UTAMA)
+================================================================================
+
+# Task Checklist Laravel Overtime App
+
+## Tahap 1: Konfigurasi Dasar (Selesai)
+- [x] Inisiasi Project Laravel menggunakan Docker/Sail
+- [x] Konfigurasi Database dan Environment
+- [x] Pembuatan Model & Migration `Overtime`
+- [x] Pembuatan Halaman UI Front-End
+- [x] Endpoint / Controller untuk menyimpan data ke database dan file image
+- [x] Verifikasi dan Penyesuaian Tampilan (Modern Design)
+
+## Tahap 2: Autentikasi Dasar (Selesai)
+- [x] Ubah Migration `users` dan `overtimes`
+- [x] Buat Database Seeder untuk Admin & User contoh
+- [x] Buat Halaman Login & Logika Autentikasi (AuthController)
+- [x] Modifikasi Halaman Form Lembur
+- [x] Buat Dashboard Admin & Endpoint Approval
+- [x] Uji fungsionalitas keseluruhan
+
+## Tahap 3: Modul Lanjutan Dashboard Admin (Selesai)
+- [x] Refaktor layout admin agar memiliki *Sidebar* navigasi
+- [x] **Halaman Dashboard/Chart**: Bar Chart total lembur per bagian menggunakan Chart.js
+- [x] **Halaman Lembur**: Tabel daftar overtimes
+- [x] **Halaman Orang / Users**: UI CRUD untuk admin
+- [x] **Halaman Report**: Export data `.csv`
+- [x] **Halaman Approved (Force Approve)**: Tombol bypass approval
+
+## Tahap 4: UI/UX & Profil Karyawan (Pengguna)
+- [x] Buat file migrasi untuk menambah kolom `nik`, `bagian`, `lokasi_kerja`, `tanda_tangan` di tabel `users`.
+- [x] Buat **Layout Pengguna** dengan *Sidebar* (seperti admin, tapi untuk user).
+- [x] **Halaman Profil Karyawan**: Form ubah profil dan menggambar/simpan tanda tangan utama.
+- [x] **Halaman Riwayat Lembur**: Menampilkan history lembur user yang login berserta status (*Waiting for Approval*, *Approved*, *Rejected*).
+- [x] **Penyempurnaan Form Lembur**: Auto-fill dari Profil. Inputan di-disable (read-only) karena data ditarik mutlak dari profil, tanda tangan langsung tertempel jika sudah ada di profil.
+
+## Tahap 5: Peran Pimpinan, Manajemen User, dan Templat LDAP
+- [x] **Admin User Management**: Hapus kolom tanda tangan dari UI form buat/ubah user (Tidak ada kolom dari awal, jadi aman).
+- [x] **Admin Role Assignment**: Admin bisa mengatur role user menjadi: `admin`, `user` (hanya input lembur), atau `pimpinan`.
+- [x] **Role Pimpinan**: Buat halaman & akses untuk pimpinan. Pimpinan bisa melihat riwayat lembur yang *approved*, melihat chart karyawan dengan lembur tertinggi, dan memiliki profil yang sama seperti user (tanpa manajemen user).
+- [x] **LDAP/LADomain Template**: Buatkan file template dan fungsionalitas scaffolding untuk menghubungkan autentikasi / data profil lewat LDAP (Domain).
+- [x] **Profil tersinkronisasi LDAP**: Ubah tampilan profil user & pimpinan untuk siap menerima/menampilkan data *readonly* dari LDAP sesuai instruksi no. 5.
+
+## Tahap 6: Real LDAP Sync & Pimpinan Approval
+- [x] **Migrasi Struktur DB Baru**: Menyesuaikan tabel `users` dan `overtimes` dengan skema SNI (`username/inisial`, `employee_name`, `employee_no`, `sub_bagian`, `divisi`, `direktorat`).
+- [x] **LdapService & AuthController**: Refaktor login menggunakan Active Directory & LDAP Bind, plus fallback SNI bypass khusus admin (`adm`).
+- [x] **Penyesuaian UI User**: Form Lembur, Profile, dan History merefleksikan field baru dari SNI (kecuali tanda tangan tetap sama).
+- [x] **Penyesuaian UI Admin**: Menu data lembur, user, reports di admin menyesuaikan field baru.
+- [x] **Aksi Pimpinan**: Tambahkan kapabilitas Approval (Setuju/Tolak) lemburan di dashboard History Pimpinan.
+
+## Tahap 7: Strict Role Provisioning
+- [x] **Admin Provisioning**: Hapus form input manual, ganti dengan Inisial Karyawan yang otomatis menarik nama/info dari `db_sni` saat di-submit.
+- [x] **Login Restriction (Auth)**: Kunci akses *login*. Karyawan hanya bisa masuk menggunakan LDAP jika inisialnya sudah pernah ditambahkan / didaftarkan Role-nya oleh Admin.
+
+## Tahap 8: Detail Lembur & Refinements (Selesai)
+- [x] **Fallback Local Profil**: Membuat field User Profile menjadi bisa diedit manual dan tanda tangan diupload secara langsung berformat file (fallback ketika LDAP/SNI nonaktif sementara).
+- [x] **Detail Form Lembur**: Menambahkan kolom `nama_lemburan`, `jam_masuk`, `jam_keluar` dengan kalkulasi otomatis `total_jam`, `nomor_tiket`, dan `pemberi_lembur`.
+- [x] **Pimpinan - Fix SQLite & Filter Bagian**: Memperbaiki error fungsi `FIELD` di SQLite dan memfilter query agar Pimpinan hanya bisa mereview/melihat lemburan dari *bagian* yang sama.
+- [x] **Pimpinan - Pemisahan Approvals & History**: Memisahkan alur Pimpinan menjadi Antrian Persetujuan khusus `waiting` dan Riwayat Disetujui/Ditolak agar lebih rapi.
+- [x] **Pimpinan & Admin - Tampilan Detail**: Menambahkan kolom detail pelaksanaan lembur (jam, nama, tiket) langsung ke dalam Data Tables.
+- [x] **Admin - Akses Readonly**: Menghilangkan kolom `Aksi` (Approve/Reject manual) di halaman Admin sesuai permintaan pengguna agas akses validasi mutlak dipegang oleh Pimpinan terkait.
+
+
+================================================================================
+BAGIAN 2: IMPLEMENTATION PLAN (RENCANA IMPLEMENTASI TEKNIS)
+================================================================================
+
+# Strict Role Provisioning & Login Restriction
+
+Implementasi manajemen akses ketat di mana Admin hanya memasukkan Inisial karyawan untuk memberikan *Role*, sementara Karyawan yang belum diberi *Role* sama sekali tidak diizinkan masuk ke aplikasi.
+
+## Proposed Changes
+
+### Admin User Management UI
+#### [MODIFY] resources/views/admin/users/index.blade.php
+- Menghapus form input manual untuk *Nama Lengkap*, *Email*, dan *Password*.
+- Menyisakan hanya input **Username (Inisial)** dan **Dropdown Role**.
+- Tampilan tabel tetap menampilkan *User* yang sudah terdaftar di database lokal.
+
+### Admin Provisioning Logic
+#### [MODIFY] app/Http/Controllers/UserController.php
+- Membatasi validasi hanya untuk `username` dan `role`.
+- Controller akan mengambil data karyawan aslinya **langsung dari database SNI** menggunakan `LdapService`.
+- Jika Inisial karyawan tidak ada di SNI, akan muncul *error*: "Karyawan dengan inisial tersebut tidak ditemukan di SNI."
+- Jika berhasil, data *Nama* dan *Email* akan diisi otomatis dari hasil _query_ SNI tersebut, kemudian disimpan ke tabel lokal `users` beserta *Role*-nya.
+
+### Login Restriction
+#### [MODIFY] app/Http/Controllers/AuthController.php
+- Menambahkan pengecekan *database lokal* persis **sebelum** proses LDAP (baris ke-38).
+- Jika `User` dengan inisial tersebut **belum didaftarkan oleh Admin**, sistem akan langsung menolak dan mencetak pesan: "Maaf, akun Anda belum memiliki hak akses / Role. Silakan hubungi Admin."
+
+### LDAP Fallback Removal
+#### [MODIFY] app/Services/LdapService.php
+- Mengubah fungsi `private data_sni()` menjadi `public` agar bisa dipanggil oleh `UserController` di atas.
+- Menghapus _logic_ `User::create(...)` di baris ke-103. Setelah perubahan ini, proses koneksi sukses LDAP hanya akan meng-_update_ data Sinkronisasi SNI tanpa bisa membuat user baru. Karyawan harus sudah berstatus "terdaftar".
+
+## Verification Plan
+
+### Manual Verification
+Pekerjaan ini akan Anda validasi secara manual dengan cara:
+1. Login sebagai `adm`.
+2. Masuk ke halaman **Management Pengguna**. Form baru hanya akan menampilkan Inisial dan Role.
+3. Masukkan Inisial sembarang yang salah (misal "XXX"), sistem harus menolak karena tidak ada di SNI.
+4. Masukkan Inisial Anda sendiri beserta Role tertentu. Sistem akan sukses mendaftarkan dan menarik otomatis nama panjang Anda dari SNI.
+5. Lakukan Logout.
+6. Coba login menggunakan Inisial teman Anda yang *belum didaftarkan* Admin (tapi password LDAP-nya benar). Sistem harus menolak loginnya.
+7. Login ulang menggunakan Inisial Anda sendiri yang *tadi telah didaftarkan*. Anda akan masuk dengan mulus.
+
+
+================================================================================
+BAGIAN 3: WALKTHROUGH & HASIL VALIDASI
+================================================================================
+
+# Phase 7: Strict Role Provisioning Walkthrough
+
+### Changes Implemented
+Sistem manajemen hak akses telah diperketat sepenuhnya sesuai instruksi Anda. Proses manual ketik-mengetik nama dan email telah dihapus untuk meminimalkan *human error* dan memaksimalkan Source of Truth dari SNI.
+
+#### 1. Admin Provisioning Otomatis
+Pada menu **Management Pengguna**, form penambahan _user_ baru sudah disederhanakan.
+- **Kondisi Sebelum**: Admin harus mengetik Nama, Email, dan Password.
+- **Kondisi Sekarang**: Admin hanya mengisi 2 field:
+  - **Username (Inisial)**
+  - **Role/Peran** (User / Pimpinan / Admin)
+
+**Alur Kerja Form Baru:**
+Saat Admin memencet tombol "Simpan Pengguna", sistem akan pergi ke _database_ SNI (melalui `LdapService::data_sni()`) untuk memvalidasi apakah Inisial tersebut benar-benar ada. 
+- Jika **Tidak Ada** di SNI: Form akan ditolak dan memunculkan *error* "Inisial / Karyawan tidak ditemukan di sumber data SNI".
+- Jika **Ada** di SNI: Sistem secara gaib (otomatis) menarik Nama Lengkap, Email Lengkap, dll dan menyelipkannya ke tabel `users` lokal berdampingan dengan Role yang Anda pilih tadi.
+
+#### 2. Kunci Pintu Login (Login Restriction)
+- File `AuthController.php` telah dimodifikasi pada baris awal logika LDAP.
+- Sekarang, bahkan sebelum sistem mencoba menghubungi (*bind*) Active Directory Lintasarta, sistem memeriksa _database_ lokal Anda: *"Apakah Inisial ini ada di tabel `users`?"*
+- Jika **Belum Ada** (artinya Admin belum mendaftarkan dan memberinya Role), sistem langsung memblokir login dalam sepersekian detik dengan peringatan: *"Maaf, Inisial akun Anda belum didaftarkan untuk mendapatkan Role akses. Silakan hubungi Administrator."*
+
+#### 3. Pembersihan Auto-Provisioning
+- Di versi sebelumnya, setiap orang yang sukses masuk LDAP akan dibuatkan akun otomatis dengan Role 'user'. Fungsi tersebut sekarang sudah dicabut 100%. Hanya Admin yang punya kuasa mendaftarkan (*provisioning*).
+
+### Validation Results
+Silakan pastikan perubahan ini berjalan sebagaimana mestinya di laptop Anda:
+1. Pastikan Anda **Login sebagai `adm`**.
+2. Masuk ke **Management Pengguna**, Anda hanya akan melihat form input Inisial. Cobalah masukkan inisial dan Role kolega Anda.
+3. Logout as `adm`.
+4. Minta kolega tersebut untuk mencoba Login di layar awal menggunakan Inisial mereka masing-masing. Mereka baru bisa masuk jika Anda sudah me-registrasi mereka di langkah 2!
+
+
+================================================================================
+BAGIAN 4: RIWAYAT KENDALA (GAGAL/ROLLBACK)
+================================================================================
+
+Selama siklus pengembangan aplikasi Gas-Lembur, terdapat beberapa pendekatan instruksi yang sempat gagal atau sengaja di-rollback karena tidak sesuai kondisi lapangan:
+
+1. [GAGAL/ROLLBACK] Autentikasi LDAP (Active Directory)
+   - Kendala: Proses bind LDAP memakan waktu lebih dari 30 detik sehingga menyebabkan error "Fatal error: Maximum execution time of 30+2 seconds exceeded in LdapService.php". Sinkronisasi ke domain `ladomain.lintasarta.co.id` kemungkinan besar terkendala network/VPN/konfigurasi port.
+   - Tindakan: Fitur LDAP di-rollback untuk sementara waktu. Login dikembalikan menggunakan autentikasi *lokal* (menggunakan tabel `users` SQLite) tetapi logika verifikasi tetap dibuat berbasis SNI dan *Username* diganti menjadi format "Inisial 3 Huruf".
+
+2. [GAGAL/ROLLBACK] Pembuatan Akun Otomatis (Auto-Provisioning) & Bentrok Email
+   - Kendala: Muncul error "SQLSTATE[23000]: Integrity constraint violation: 19 UNIQUE constraint failed: users.email" saat menguji skenario login akun yang belum terdaftar. Fungsi auto-provisioning sebelumnya menabrak *rule* database SQLite karena data asalnya bentrok.
+   - Tindakan: Sistem *auto-mendaftar* secara otomatis dicabut (*Strict Provisioning*). Saat ini **semua** otorisasi dikelola ketat oleh Admin. Admin cukup menginput Inisial, lalu sistem menarik detail SNI perlahan di awal untuk menghindari bentrok data.
+
+3. [GAGAL/ROLLBACK] Input Tanda Tangan Menggunakan "Draw Pad / Canvas"
+   - Kendala: Menggunakan canvas digital dirasa kurang praktis untuk Karyawan dan Pimpinan karena menghambat *workflow* (susah menggambar di layar bagi pengguna PC tanpa mouse external/trakpad).
+   - Tindakan: Fitur di-rollback secara utuh ke formulir **Upload File Gambar (.jpeg / .png)** klasik yang jauh lebih *user-friendly*!
+
+4. [GAGAL/ROLLBACK] Otoritas Ganda pada Menu Admin
+   - Kendala: Di pertengahan jalan, halaman *Data Lembur* bagi Admin direncana bisa memiliki fitur Setujui/Tolak. Namun ini diprotes karena mengakibatkan tumpang tindih otorisasi; validasi aktual wajib ditutup murni via Pimpinan departemen saja.
+   - Tindakan: Kolom Aksi dilepas dan dicabut dari *Admin Table*, menggabungkan data menjadi arsip *read-only* bagi Admin.
+
+5. [FIX ISSUES] SQLite Compatibility Error (Fungsi FIELD)
+   - Kendala: Sempat terdapat error "General error: 1 no such function: FIELD" pada *view* riwayat Pimpinan karena `ORDER BY FIELD()` adalah fungsi bawaan *MySQL*, sedangkan environment Laravel Anda menggunakan database *SQLite*.
+   - Tindakan: Diperbaiki otomatis menggunakan metode query konvensional dengan blok logika SQL asli Laravel (`CASE WHEN THEN`).
+
+
+================================================================================
+BAGIAN 5: HISTORI PROMPT PENGGUNA (DARI INCUBATION AWAL PROJECT)
+================================================================================
+
+Berikut rekam jejak permintaan, instruksi, serta percakapan inti secara kronologis dari inisialisasi awal (*Brainstorming*) hingga penyelesaian aplikasi saat ini:
+
+[PROMPT 1 / OBJECTIVE]
+> Laravel Overtime App
+> The user wants to build a web-based overtime application using the Laravel framework. The application needs to include fields for Name, NIK, Department/Division, and Work Location. The layout, placement, and font of these fields should precisely match a provided image (which is not included in this context)...
+
+[PROMPT 2 / ARCHITECTURE]
+> User Profile & History Enhancement
+> The user's objective is to enhance the user experience by implementing a dedicated profile section for employees. This includes allowing users to set their NIK, department, work location, and a default signature. The system should then automatically populate the overtime request form with this profile information, making it read-only...
+
+[PROMPT 3]
+> Buat file migrasi untuk menambah kolom nik, bagian, lokasi_kerja, tanda_tangan di tabel users.
+
+[PROMPT 4]
+> saya coba login dan menggunakan inisial saya dengan login ldap kenapa masih muncul error "Login gagal, username atau password salah" sedangkan saya memasukan insiial dan password ladomain saya betul apakah tidak terpanggil atau ada configurasi yang salah minta tolong di cek...
+
+[PROMPT 5]
+> error ini kenapa, tolong di jelaskan
+1. Fatal error: Maximum execution time of 30+2 seconds exceeded (terminated) in /Users/farhandwiharyanto/Gas-Lembur/app/Services/LdapService.php on line 62
+2. di ui begini "This page isn’t working 127.0.0.1 didn’t send any data. ERR_EMPTY_RESPONSE" tolong di jelaskan jugaa yaa kenapa bisa error...
+
+[PROMPT 6]
+> tolong ubah:
+1. di halaman admin dan sidebar management pengguna diubah semua (tidak ada yang di tambahkan manual) dan diganti menjadi user2 yang ada di db_sni, kecuali di sidebar ini bisa menambahkan role saja yang mau di tambahkan ke user2nya
+2. ketika sudah di pilih role akan bisa login dan ketika belum ada role tidak akan bisa login
+
+[PROMPT 7]
+> untuk sekarang dikarenakan belum berhasil login dan belum menemukan logic untuk login menggunakan LDAP tolong di ubah menjadi login sebelumnya menggunakan lokal tetapi untuk inisial menggunakan inisial (3 huruf), sampai saya menemukan logic untuk saya lanjutkan dan berhasil login by ldap
+
+[PROMPT 8]
+> saya mau coba menambahkan role saya sebagai administrator dengan memasukan inisial saya (dummy) muncul error ini "SQLSTATE[23000]: Integrity constraint violation: 19 UNIQUE constraint failed: users.email..." tolong perkaiki dan untuk halaman kanan yang di management user di hapus saja untuk yang FWY...
+
+[PROMPT 9]
+> di management user tidak hanya bisa menambahakn user, tetapi bisa mengubah rolse user ataupun ngedelete user atau lemburan yang masih pending karena lama pendingan di pimpinan karena saya mau testing end to end...
+
+[PROMPT 10]
+> ohiya saya lupaa untuk di halaman profil bisa diinput manual dulu saja jangan di ambil dari SNI, karena untuk ldapnya masih belum di jalankan dan masih menggunakan password lokal
+
+[PROMPT 11]
+> untuk tanda tangan, buatkan hanya bisa upload tanda tangan saja agar memudahkan orang upload tanda tangan tanpa menulis ataupun menggunakan mouse/trakpad 
+
+[PROMPT 12]
+> tolong benarkan ya:
+1. di halaman pimpinan dan di masuk ke halaman riwayat di setujui muncul error "SQLSTATE[HY000]: General error: 1 no such function: FIELD..."
+2. tambahkan 1 sidebar di pimpinan untuk masukan halaman approved atau engga...
+3. di halaman user tolong tambahkan pada form lemburan dibawah data diri tambahkan free text (Nama Lemburan, Jam masuk dan jam keluar, muncul total jamnya, Nomor tiket, Pemberi lembur)
+4. untuk kolom aksi di halaman admin di sidebar Daftar Pengajuan Lembur, sepertinya di hapus aja tidak usah di tampilkan
+
+[PROMPT 13]
+> tolong lanjutkan yang tadi
+
+[PROMPT 14]
+> tolong buatkan dalam bentuk txt, untuk semua dokumentasinyaa dari awal pembuatan aplikasi gas-lembur dari tasknya, scratchpadnya, implementation plan nya dan walkthroughnya jangan ada yang terlewat karena saya mau simpan di github saya
+
+[PROMPT 15]
+> tolong tambahkan jugaa yang versi rollback ataupun gagalnya jugaa yaa di paling bawah agar saya tau apa saja yang saya lakukan tetapi gagal dan kalau bisa, tambahkan semua prompt yang sudah saya tuliskan dari awal pembuatan project sampai sekarang ya
+
+
+================================================================================
+BAGIAN 6: PANDUAN PENGELOLAAN GITHUB (REMOTE, PUSH, PULL)
+================================================================================
+
+Berikut tata cara resmi untuk menyambungkan, melakukan Push, maupun Pull project Gas-Lembur ke repository GitHub Anda (Akun: farhandwiharyanto):
+
+### 1. Inisialisasi Lokal (Cara Menyambungkan ke GitHub)
+Apabila folder ini belum terinisialisasi secara remote Git, jalankan command ini sekali saja:
+```bash
+git init
+git add .
+git commit -m "First commit: Gas-Lembur Initial Release"
+git branch -M main
+git remote add origin https://github.com/farhandwiharyanto/Gas-Lembur.git
+git push -u origin main
+```
+*Catatan Penting: Pastikan Anda terlebih dahulu membuat repository/wadah kosong bernama "Gas-Lembur" di halaman web GitHub Anda.*
+
+### 2. Tata Cara Melakukan Push (Menyimpan Perubahan Harian)
+Setiap kali Anda selesai memodifikasi kode, memperbaiki bug, atau memperbarui dokumentasi (seperti file .txt ini), Anda wajib melempar kode tersebut ke awan (GitHub):
+```bash
+git add .
+git commit -m "Pesan update kerjaan hari ini, contoh: Fix fitur pimpinan"
+git push origin main
+```
+
+### 3. Tata Cara Melakukan Pull (Menarik Kode Terkini)
+Saat Anda berganti laptop kerja atau rekan kerja melakukan Push ke repository yang sama, Anda perlu menarik pembaruan terbaru agas selaras:
+```bash
+git pull origin main
+```
+
+*Tips:*
+Jika ditanya _username_ dan _password_ di Terminal saat melakukan proses push/pull, masukkan Username GitHub Anda dan masukkan **Personal Access Token (PAT)** sebagai password.*
