@@ -59,6 +59,21 @@
                                 </span>
                             @endif
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <div class="flex justify-center items-center space-x-2">
+                                <form action="{{ route('pimpinan.approve', $overtime->id) }}" method="POST" class="inline">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" onclick="return confirm('Setujui lemburan ini?')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-md shadow-sm transition-colors">Setuju</button>
+                                </form>
+                                <form action="{{ route('pimpinan.reject', $overtime->id) }}" method="POST" class="inline">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" onclick="return confirm('Tolak lemburan ini?')" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md shadow-sm transition-colors">Tolak</button>
+                                </form>
+                                <a href="{{ route('overtime.print', $overtime->id) }}" target="_blank" class="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 font-semibold rounded-md shadow-sm text-xs border border-blue-200 transition-colors">
+                                    Cetak
+                                </a>
+                            </div>
+                        </td>
                     </tr>
                 @empty
                     <tr>

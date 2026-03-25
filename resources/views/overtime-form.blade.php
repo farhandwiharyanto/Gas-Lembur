@@ -5,7 +5,7 @@
 @section('content')
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden max-w-4xl mx-auto">
     <div class="px-8 py-6 border-b border-gray-100 text-center">
-        <h2 class="text-2xl font-bold text-gray-800">Formulir Lembur</h2>
+        <h2 class="text-2xl font-bold text-gray-800">{{ isset($overtime) ? 'Edit Pengajuan Lembur' : 'Formulir Lembur' }}</h2>
         <p class="text-sm text-gray-500 mt-2">Data diri Anda ditarik otomatis dari profil. Lengkapi detail pekerjaan lembur di bawah ini.</p>
     </div>
 
@@ -27,8 +27,9 @@
         </div>
     @endif
 
-    <form id="overtimeForm" action="{{ route('overtime.store') }}" method="POST" class="p-8 space-y-8">
+    <form id="overtimeForm" action="{{ isset($overtime) ? route('overtime.update', $overtime->id) : route('overtime.store') }}" method="POST" class="p-8 space-y-8">
         @csrf
+        @if(isset($overtime)) @method('PUT') @endif
         
         <!-- Bagian Data Diri (Read Only) -->
         <fieldset class="border border-gray-200 rounded-xl p-6 bg-gray-50/50 relative">
@@ -73,34 +74,39 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
                 <div class="md:col-span-2">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Lemburan</label>
-                    <input type="text" name="nama_lemburan" required placeholder="Contoh: Maintenance Server"
+                    <input type="text" name="nama_lemburan" value="{{ old('nama_lemburan', $overtime->nama_lemburan ?? '') }}" required placeholder="Contoh: Maintenance Server"
                         class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Jam Masuk</label>
-                    <input type="time" name="jam_masuk" id="jam_masuk" required
+                    <input type="time" name="jam_masuk" id="jam_masuk" value="{{ old('jam_masuk', $overtime->jam_masuk ?? '') }}" required
                         class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Jam Keluar</label>
-                    <input type="time" name="jam_keluar" id="jam_keluar" required
+                    <input type="time" name="jam_keluar" id="jam_keluar" value="{{ old('jam_keluar', $overtime->jam_keluar ?? '') }}" required
                         class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Total Jam Lembur</label>
-                    <input type="text" name="total_jam" id="total_jam" required readonly placeholder="0.00"
+                    <input type="text" name="total_jam" id="total_jam" value="{{ old('total_jam', $overtime->total_jam ?? '') }}" required readonly placeholder="0.00"
                         class="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600 cursor-not-allowed font-mono">
                 </div>
                 <div class="hidden md:block"></div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Nomor Tiket</label>
-                    <input type="text" name="nomor_tiket" required placeholder="Contoh: INC001122"
+                    <input type="text" name="nomor_tiket" value="{{ old('nomor_tiket', $overtime->nomor_tiket ?? '') }}" required placeholder="Contoh: INC001122"
                         class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Pemberi Lembur</label>
-                    <input type="text" name="pemberi_lembur" required placeholder="Contoh: Pak Budi"
-                        class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
+                    <select name="pemberi_lembur" required class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
+                        <option value="" disabled {{ !isset($overtime) ? 'selected' : '' }}>Pilih Pemberi Lembur</option>
+                        <option value="ARIE ANDRIAN" {{ (isset($overtime) && $overtime->pemberi_lembur == 'ARIE ANDRIAN') ? 'selected' : '' }}>ARIE ANDRIAN</option>
+                        <option value="SURYO HARTANTO" {{ (isset($overtime) && $overtime->pemberi_lembur == 'SURYO HARTANTO') ? 'selected' : '' }}>SURYO HARTANTO</option>
+                        <option value="MUHAMMAD RIZQI ANDRIAN" {{ (isset($overtime) && $overtime->pemberi_lembur == 'MUHAMMAD RIZQI ANDRIAN') ? 'selected' : '' }}>MUHAMMAD RIZQI ANDRIAN</option>
+                        <option value="MUH. GHOFARUDIN FALAH" {{ (isset($overtime) && $overtime->pemberi_lembur == 'MUH. GHOFARUDIN FALAH') ? 'selected' : '' }}>MUH. GHOFARUDIN FALAH</option>
+                    </select>
                 </div>
             </div>
         </fieldset>
@@ -136,7 +142,7 @@
         <div class="pt-4 flex justify-end">
             @if(auth()->user()->tanda_tangan)
                 <button type="submit" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 focus:ring-4 focus:ring-indigo-200">
-                    Kirim Pengajuan Lembur
+                    {{ isset($overtime) ? 'Simpan Perubahan' : 'Kirim Pengajuan Lembur' }}
                 </button>
             @else
                 <button type="button" disabled class="px-8 py-3 bg-gray-400 text-white font-bold rounded-xl shadow cursor-not-allowed opacity-70">

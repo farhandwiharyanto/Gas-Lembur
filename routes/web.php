@@ -13,6 +13,9 @@ Route::middleware(['auth'])->group(function () {
     // Rute user (form lembur)
     Route::get('/', [OvertimeController::class, 'create'])->name('overtime.create');
     Route::post('/submit', [OvertimeController::class, 'store'])->name('overtime.store');
+    Route::get('/overtime/{id}/edit', [OvertimeController::class, 'edit'])->name('overtime.edit');
+    Route::put('/overtime/{id}', [OvertimeController::class, 'update'])->name('overtime.update');
+    Route::get('/overtime/{id}/print', [OvertimeController::class, 'print'])->name('overtime.print');
 
     // Rute Employee Portal
     Route::get('/profile', [\App\Http\Controllers\UserProfileController::class, 'edit'])->name('user.profile.edit');

@@ -3,6 +3,22 @@
 @section('header_title', 'Riwayat Lembur')
 
 @section('content')
+<!-- Dashboard Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 max-w-6xl mx-auto">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
+        <div class="text-gray-500 text-sm font-semibold mb-1">Total Jam (Disetujui)</div>
+        <div class="text-3xl font-bold text-emerald-600">{{ $totalApproved }} <span class="text-lg font-medium text-gray-400">Jam</span></div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
+        <div class="text-gray-500 text-sm font-semibold mb-1">Total Jam (Menunggu)</div>
+        <div class="text-3xl font-bold text-yellow-500">{{ $totalWaiting }} <span class="text-lg font-medium text-gray-400">Jam</span></div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
+        <div class="text-gray-500 text-sm font-semibold mb-1">Total Jam (Ditolak)</div>
+        <div class="text-3xl font-bold text-red-500">{{ $totalRejected }} <span class="text-lg font-medium text-gray-400">Jam</span></div>
+    </div>
+</div>
+
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden max-w-6xl mx-auto">
     <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
         <div>
@@ -22,6 +38,7 @@
                     <th scope="col" class="px-6 py-4 font-semibold">NAMA & NIK</th>
                     <th scope="col" class="px-6 py-4 font-semibold">BAGIAN</th>
                     <th scope="col" class="px-6 py-4 font-semibold text-center">STATUS</th>
+                    <th scope="col" class="px-6 py-4 font-semibold text-center">AKSI</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -56,6 +73,18 @@
                                     {{ $overtime->status }}
                                 </span>
                             @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            @if($overtime->status == 'waiting' || $overtime->status == 'pending')
+                                <a href="{{ route('overtime.edit', $overtime->id) }}" class="inline-flex items-center px-3 py-1.5 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 rounded-md text-xs font-semibold transition-colors mt-1 border border-yellow-100 mr-1">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    Edit
+                                </a>
+                            @endif
+                            <a href="{{ route('overtime.print', $overtime->id) }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-md text-xs font-semibold transition-colors mt-1 border border-blue-100">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                Cetak
+                            </a>
                         </td>
                     </tr>
                 @empty

@@ -8,6 +8,22 @@
     <p class="text-sm text-gray-500 mt-1">Pantau statistik karyawan dengan intensitas lembur tertinggi yang telah disetujui (Approved).</p>
 </div>
 
+<!-- Dashboard Metric Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
+        <div class="text-gray-500 text-sm font-semibold mb-1">Total Jam (Disetujui)</div>
+        <div class="text-3xl font-bold text-emerald-600">{{ $totalApproved }} <span class="text-lg font-medium text-gray-400">Jam</span></div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
+        <div class="text-gray-500 text-sm font-semibold mb-1">Total Jam (Menunggu)</div>
+        <div class="text-3xl font-bold text-yellow-500">{{ $totalWaiting }} <span class="text-lg font-medium text-gray-400">Jam</span></div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
+        <div class="text-gray-500 text-sm font-semibold mb-1">Total Jam (Ditolak)</div>
+        <div class="text-3xl font-bold text-red-500">{{ $totalRejected }} <span class="text-lg font-medium text-gray-400">Jam</span></div>
+    </div>
+</div>
+
 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
     <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Top 10 Karyawan Lembur Tertinggi</h2>
     

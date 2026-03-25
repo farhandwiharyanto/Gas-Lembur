@@ -10,8 +10,16 @@ class PimpinanController extends Controller
 {
     public function dashboard()
     {
-        // Chart: User with highest count of approved overtimes
+        $userBagian = auth()->user()->bagian;
+
+        // Calculate totals for employees in the same bagian
+        $totalApproved = Overtime::where('bagian', $userBagian)->where('status', 'approved')->sum('total_jam');
+        $totalWaiting = Overtime::where('bagian', $userBagian)->whereIn('status', ['waiting', 'pending'])->sum('total_jam');
+        $totalRejected = Overtime::where('bagian', $userBagian)->where('status', 'rejected')->sum('total_jam');
+
+        // Chart: User with highest count of approved overtimes IN THE SAME BAGIAN
         $chartData = Overtime::select('user_id', DB::raw('count(*) as total'))
+            ->where('bagian', $userBagian)
             ->where('status', 'approved')
             ->groupBy('user_id')
             ->orderByDesc('total')
@@ -22,7 +30,7 @@ class PimpinanController extends Controller
         $labels = $chartData->map(fn($o) => $o->user->name ?? 'Unknown')->toArray();
         $data = $chartData->map(fn($o) => $o->total)->toArray();
 
-        return view('pimpinan.dashboard', compact('labels', 'data'));
+        return view('pimpinan.dashboard', compact('labels', 'data', 'totalApproved', 'totalWaiting', 'totalRejected'));
     }
 
     public function approvals()

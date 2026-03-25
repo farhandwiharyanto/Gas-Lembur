@@ -63,6 +63,16 @@ BAGIAN 1: TASK CHECKLIST (DAFTAR TUGAS & FITUR UTAMA)
 - [x] **Pimpinan & Admin - Tampilan Detail**: Menambahkan kolom detail pelaksanaan lembur (jam, nama, tiket) langsung ke dalam Data Tables.
 - [x] **Admin - Akses Readonly**: Menghilangkan kolom `Aksi` (Approve/Reject manual) di halaman Admin sesuai permintaan pengguna agas akses validasi mutlak dipegang oleh Pimpinan terkait.
 
+## Tahap 9: Dokumen & Dashboard Karyawan/Pimpinan (Selesai)
+- [x] **Template Dokumen Cetak/Print**: Membuat view template "Surat Tugas Lembur" persis dengan desain standar perusahaan, yang terisi dinamis (Nama karyawan, atasan langsung, dll)
+- [x] **Dropdown Pemberi Lembur**: Mengganti text input menjadi dropdown spesifik pada form pengajuan lembur.
+- [x] **Metric Dashboard Total Jam**: Ringkasan akumulasi seluruh Jam Lembur sesuai status (Disetujui, Menunggu, Ditolak) pada halaman Karyawan dan halaman Pimpinan (difilter berdasarkan "bagian/divisi" sang pimpinan).
+
+## Tahap 10: PDF Print & Edit Sebelum Approval (Selesai)
+- [x] **Cetak PDF Otomatis**: Instalasi library `laravel-dompdf`. Tombol Cetak langsung men-download (meng-generate) PDF dokumen surat tugas.
+- [x] **Import Tanda Tangan**: Memasukkan `<img>` rendering dari signature canvas ke PDF template cetak.
+- [x] **Form Edit Waiting**: Menambahkan fitur _Edit_ yang me-reuse tampilan `overtime-form.blade.php` dengan metode `PUT` dan mengisi ulang values input. Tombol dikunci (tidak tampil) setelah status beranjak dari `waiting`.
+
 
 ================================================================================
 BAGIAN 2: IMPLEMENTATION PLAN (RENCANA IMPLEMENTASI TEKNIS)
@@ -270,3 +280,158 @@ git pull origin main
 
 *Tips:*
 Jika ditanya _username_ dan _password_ di Terminal saat melakukan proses push/pull, masukkan Username GitHub Anda dan masukkan **Personal Access Token (PAT)** sebagai password.*
+
+[PROMPT 16]
+> tolong perbaiki ini
+> 1. untuk Pemberi Lembur di karyawan dibikin dropdown dengan nama berikut: Arie Andrian, Suryo Hartanto, Muhammad Rizqi Andrian, Muh. Ghofarudin Falah. Buatkan semua upper yaa
+> 2. di masing2 halaman dibuatkan dashboard untuk melihat total jam yang sudah di buatkan lembur
+>  - untuk di karyawan hanya bisa melihat dirinya sendiri
+>  - untuk pimpinan bisa melihat karyawannya tetapi hanya dibagian dia saja 
+> 3. di dashboard itu juga bisa melihat status lemburan apakah sudah di approvel atau belum (di karyawan dan di pimpinan)
+> 4. setiap yang saya prompt, hasilnya dan problemnya di tambahkan di dokumentasi ya 
+
+[IMPLEMENTASI & HASIL - PROMPT 16]
+- Form Lembur karyawan di-update agar input 'Pemberi Lembur' menggunakan tag <select> khusus yang berisi keempat nama dalam huruf kapital.
+- User History di-ubah layoutnya menjadi "Dashboard Karyawan", menambahkan 3 kartu matriks yang menghitung rekapan Total Jam berdasarkan status: Disetujui (Approved), Menunggu (Waiting), dan Ditolak (Rejected). Total di-kalkulasi murni untuk _auth()->id()_.
+- Pimpinan Dashboard ditambahkan 3 kartu matriks serupa yang mengagregasi semua jam lembur dari seluruh *user* yang memiliki `bagian` persis dengan Pimpinan tersebut. Query *Chart Top 10* yang di layar ini pun telah diperbaiki dengan ditambahkan filter `where('bagian', $userBagian)` agar tidak menarik semua departemen (sebelumnya tercampur semua).
+- (Problem) Tidak ada problem signifikan, hanya saja data lembur `overtimes` sebelumnya yang tidak menggunakan huruf kapital di 'pemberi_lembur' tidak akan ter-match jika di-edit (tapi karena fitur view history bersifat text statis, hal ini tidak mengganggu riwayat lama).
+
+[PROMPT 17]
+> Tolong perbaiki ini 
+> 1. tanda tangan masih belum ke import waktu mau cetak 
+> 2. waktu cetak langsung download as PDF
+> 3. Ada request lembur, sebelum approval bisa di edit tetapi setelah di approved tidak bisa di edit 
+
+[IMPLEMENTASI & HASIL - PROMPT 17]
+- (PDF Print) Menginstal `barryvdh/laravel-dompdf` dan mengubah fungsi `print` pada `OvertimeController`. File kini langsung ter-unduh secara otomatis dengan format PDF saat tombol Cetak diklik.
+- (Tanda Tangan) View referensi cetak diubah dengan menyematkan tag `<img>` yang membongkar gambar tanda_tangan yang tersimpan, baik milik Karyawan maupun Pimpinan (mendukung metode base64 bawaan ttd pad).
+- (Edit Form) Menambahkan rute dan controller `edit` / `update`, menambah tombol **Edit** berwarna kuning di tabel "Riwayat Lembur" Karyawan (hanya muncul saat log status masih `waiting` atau `pending`), serta menyempurnakan `overtime-form.blade.php` agar dapat melakukan modifikasi form pengajuan yang sama tanpa membuat ID baru. Pengajuan yang sudah berstatus `approved` otomatis menjadi readonly/locked.
+
+================================================================================
+BAGIAN 7: LAMPIRAN ARTIFAK SISTEM (TAHAP 9 & 10)
+================================================================================
+Dokumentasi ini menyimpan seluruh artifak (Task, Implementation, dan Walkthrough) yang dijalankan oleh AI pada fase penyelesaian Surat Tugas Cetak, Metrik Dashboard, dan Konversi PDF.
+
+--- [ARTIFAK: TASK CHECKLIST] ---
+# Task Checklist
+- [x] Investigate the existing `ReportController` and `admin/reports/index.blade.php` view.
+- [x] Determine where the "Print" / "Cetak" button for the *Surat Tugas Lembur* will be placed (likely in the report table rows or overtime detail).
+- [x] Create a new route and controller method (e.g., `print` or `cetakSuratTugas`) to generate the *Surat Tugas Lembur*.
+- [x] Create a blade view for the *Surat Tugas Lembur* template that matches the provided image.
+- [x] Apply the necessary dynamic bindings:
+  - `Nama`, `NIK`, `Bagian`, `Lokasi Kerja` of the employee.
+  - `Hari/Tanggal`, `Durasi Jam Lembur`, `Tugas` from the overtime request.
+  - Manager's name and NIK at the bottom left ("Mengetahui atasan langsung").
+  - Current date (Jakarta, `tanggal lembur`) and employee's name & NIK at the bottom right.
+- [x] Implement print window or PDF generation (window.print() in a clean view is the simplest).
+
+## Dashboard & Form Enhancements
+- [x] Update form lembur: make "Pemberi Lembur" a dropdown with specific uppercase names.
+- [x] Update Karyawan History view to serve as a dashboard showing their "total jam lembur" aggregated by status.
+- [x] Update Pimpinan Dashboard view to show "total jam lembur" for employees in their `bagian`, grouped by employee and status.
+- [x] Update `DOKUMENTASI_GAS_LEMBUR.txt` with the prompt, results, and issues.
+
+## PDF Print & Editable Overtime
+- [x] Install `barryvdh/laravel-dompdf`.
+- [x] Update `resources/views/overtime/print.blade.php` to include `<img>` tags for the manager and employee signatures and adjust CSS for PDF rendering.
+- [x] Modify `OvertimeController@print` to generate and download a PDF instead of returning an HTML view.
+- [x] Implement Edit feature: update `routes/web.php` for `edit` and `update` logic.
+- [x] Modify `overtime-form.blade.php` to support editing an existing `waiting` overtime request.
+- [x] Add an "Edit" button to `user/history/index.blade.php` for `waiting` status.
+- [x] Document the updates in `DOKUMENTASI_GAS_LEMBUR.txt`.
+
+
+--- [ARTIFAK: IMPLEMENTATION PLAN] ---
+# PDF Print & Editable Overtime Implementation Plan
+
+## Proposed Changes
+### 1. Cetak langsung download as PDF
+#### [NEW] Dependencies
+- Execute `composer require barryvdh/laravel-dompdf` to install `laravel-dompdf` for backend PDF rendering.
+
+#### [MODIFY] app/Http/Controllers/OvertimeController.php
+- Update the `print($id)` method to use `$pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(...)`.
+- Change the return to `return $pdf->download('Surat_Tugas_Lembur_' . $overtime->id . '.pdf');`.
+
+### 2. Import Tanda Tangan pada Dokumen Cetak
+#### [MODIFY] resources/views/overtime/print.blade.php
+- Convert plain text signatures to include `<img>` tags referencing the absolute paths of the generated or uploaded signatures if they exist.
+- Since DomPDF parses HTML directly, we need to ensure the images are base64 encoded or absolute paths so DomPDF can read them correctly. 
+- Example: `<img src="{{ public_path('storage/' . $overtime->tanda_tangan) }}" style="height: 80px;">`.
+- Modify style tags to be compatible with DomPDF (remove absolute positions if unnecessary, adjust margins).
+
+### 3. Edit Form Sebelum Approval
+#### [MODIFY] routes/web.php
+- Add `Route::get('/overtime/{id}/edit', [OvertimeController::class, 'edit'])->name('overtime.edit');`
+- Add `Route::put('/overtime/{id}', [OvertimeController::class, 'update'])->name('overtime.update');`
+
+#### [MODIFY] app/Http/Controllers/OvertimeController.php
+- Implement `edit($id)`:
+  - Check if the overtime status is `waiting`. If not, abort or redirect with an error message back to history.
+  - Return the `overtime-form` blade view, passing the `$overtime` and setting a flag `$isEdit = true`.
+- Implement `update(Request $request, $id)`:
+  - Validate the data just like `store`.
+  - Check if `tanda_tangan` was updated (base64). If yes, upload it. If not, retain the old one.
+  - Update the record and return to history.
+
+#### [MODIFY] resources/views/overtime-form.blade.php
+- Make form action dynamic: `action="{{ isset($overtime) ? route('overtime.update', $overtime->id) : route('overtime.store') }}"`
+- Dynamically add `@method('PUT')` if `$overtime` is set.
+- Pre-fill values using `value="{{ old('...', $overtime->... ?? auth()->user()->...) }}"` pattern.
+
+#### [MODIFY] resources/views/user/history/index.blade.php
+- In the "AKSI" section, add a conditionally rendered "Edit" button specifically for overtimes whose status is `waiting` or `pending`.
+
+### 4. Update Dokumentasi
+#### [MODIFY] DOKUMENTASI_GAS_LEMBUR.txt
+- Add `[PROMPT 17]` regarding PDF download, missing signatures, and editing pre-approval overtimes.
+- Document the implementation details and commands run.
+
+
+--- [ARTIFAK: WALKTHROUGH] ---
+# Surat Tugas Lembur Template Implementation Walkthrough
+
+## Changes Implemented
+Saya telah berhasil membuat template untuk mencetak "Surat Tugas Lembur" berdasarkan gambar yang Anda berikan. Berikut adalah penyelesaiannya:
+
+1. **Membuat Format Surat (Template)**:
+   - Dibuat file view khusus `overtime/print.blade.php`.
+   - Menambahkan header logo "lintas media danawa" beserta teksnya.
+   - Semua kolom yang diminta ("Di instruksikan kepada", "Untuk melaksanakan lembur pada", "Pelaksanaan lembur") disesuaikan untuk mengambil data dinamis dari setiap form lembur karyawan.
+   - Kolom penandatangan "Mengetahui Atasan Langsung" disiapkan untuk otomatis mencetak **Nama** dan **NIK Pimpinan** yang memiliki *bagian* yang sama dengan karyawan.
+   - Kolom penandatangan "Yang menyatakan dan di beri tugas" mencetak **Nama** dan **NIK Karyawan** di kanan bawah.
+   - Lokasi dan Tanggal (`Jakarta, [tanggal lembur]`) otomatis mengikuti tanggal pelaksanaan lembur/pengisian (*jam masuk*), bukan hari disaat karyawan mencetak dokumen.
+   
+2. **Membuat Controller & Endpoint**:
+   - Menambahkan _method_ `print()` pada `OvertimeController` yang bertugas mencari data Pimpinan berdasarkan departemen karyawan untuk ditempelkan di surat tugas.
+   - Route `overtime/{id}/print` ditambahkan menggunakan _middleware_ `auth` agar terlindungi.
+
+3. **Menambahkan Tombol Cetak / Print**:
+   - Menambahkan tombol "Cetak" di masing-masing baris tabel pengajuan lembur. Tombol ini terdapat pada 4 halaman:
+     - Riwayat Lembur Karyawan (`user/history/index.blade.php`)
+     - Manajemen Data Lembur Admin (`admin/overtimes/index.blade.php`)
+     - Antrian Persetujuan Pimpinan (`pimpinan/approvals.blade.php`)
+     - Riwayat Lembur Pimpinan (`pimpinan/history.blade.php`)
+     
+   Ketika tombol "Cetak" ditekan, *browser* akan membuka *tab* baru dan otomatis memanggil jendela *Print* bawaan sistem (Chrome/Safari/Edge).
+
+## Testing Performed
+- **Syntax Check**: Telah divalidasi struktur tag dan logic Blade menggunakan perintah _artisan view:cache_, terbukti tidak ada error sintaks.
+- **Pimpinan Binding**: Telah divalidasi logic `\App\Models\User::where('role', 'pimpinan')->where('bagian', $overtime->bagian)->first()` yang akan mengambil nama & NIK atasan secara akurat dan menampilkannya pada kolom Tanda Tangan Atasan Langsung.
+
+## Dashboard & Form Enhancements (Update)
+Sesuai dengan _request_ Anda, berikut penyelesaian dari *dashboard metrics* dan pembatasan form:
+1. **Dropdown Pemberi Lembur (Formulir User)**:
+   Input teks "Pemberi Lembur" telah diubah menjadi dropdown yang mengunci pilihan (huruf kapital semua) hanya ke 4 orang: ARIE ANDRIAN, SURYO HARTANTO, MUHAMMAD RIZQI ANDRIAN, dan MUH. GHOFARUDIN FALAH.
+2. **Dashboard Karyawan / User**:
+   Pada halaman "Riwayat Lembur Anda", telah ditambahkan 3 buah _Metric Cards_ (Kartu Ringkasan) di bagian atas yang menghitung "Total Jam Lembur" historikal khusus milik Anda, yang dikelompokkan menjadi: **Disetujui**, **Menunggu**, dan **Ditolak**.
+3. **Dashboard Pimpinan**:
+   Halaman Beranda (Dashboard) Pimpinan kini juga ditambahkan 3 _Metric Cards_ serupa. Bedanya, angka *total jam lembur* ini dikalkulasikan dengan mengagregasi semua karyawan yang bernaung di dalam `bagian` (departemen) yang persis sama dengan pimpinan. Grafik Top 10 juga telah diperbaiki filter *query*-nya agar hanya menampilkan karyawan dari divisinya saja.
+4. **Dokumentasi**:
+   Seluruh rekaman prompt Anda serta detail implementasi teknis & _problem_ (terkait potensi rekacatat format kapital dari baris data lama) telah di-rekam rapi di dalam file `DOKUMENTASI_GAS_LEMBUR.txt` di *Bottom Section* ([PROMPT 16]).
+
+## PDF Print & Editable Overtime
+Pembaruan terkini pada sistem mencakup fitur krusial berikut:
+1. **Unduh Otomatis PDF**: Tombol Cetak (Print) kini sudah dibekali teknologi `laravel-dompdf`. Ketika di-klik, alih-alih menampilkan _new window_ browser biasa, peramban akan langsung mengunduh/menyimpan file berekstensi `.pdf`.
+2. **Impor Tanda Tangan**: Kode penarikan tanda tangan berformat _base64_ maupun _image path_ khusus milik akun Karyawan (pengaju) dan akun Pimpinan di departemen (*bagian*) masing-masing telah diimplementasikan ke dalam struktur cetak tersebut.
+3. **Fitur Edit Pengajuan**: Khusus bagi pengajuan lembur yang berstatus *Waiting* (atau *Pending*), Karyawan akan melihat tombol **Edit** baru (ikon kuning) di samping tombol Cetak pada tabel halaman History mereka. Menekan tombol ini akan me-*load* ulang formulir pengajuan dengan seluruh data *existing* siap diubah. Begitu status berubah menjadi **Approved**, tombol Edit tidak akan ditampilkan.
