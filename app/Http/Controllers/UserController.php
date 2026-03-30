@@ -23,6 +23,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
             'role' => 'required|in:admin,user,pimpinan',
+            'lokasi_kerja' => 'nullable|string|max:100',
         ]);
 
         User::create([
@@ -31,6 +32,7 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => \Illuminate\Support\Facades\Hash::make($request->password),
             'role' => $request->role,
+            'lokasi_kerja' => $request->lokasi_kerja,
         ]);
 
         return redirect()->back()->with('success', 'Pengguna baru berhasil ditambahkan.');
@@ -52,12 +54,14 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'role' => 'required|in:admin,user,pimpinan',
             'password' => 'nullable|string|min:6',
+            'lokasi_kerja' => 'nullable|string|max:100',
         ]);
 
         $user->username = strtolower(trim($request->username));
         $user->name = $request->name;
         $user->email = $request->email;
         $user->role = $request->role;
+        $user->lokasi_kerja = $request->lokasi_kerja;
 
         if ($request->filled('password')) {
             $user->password = \Illuminate\Support\Facades\Hash::make($request->password);

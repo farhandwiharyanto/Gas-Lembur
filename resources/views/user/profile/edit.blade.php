@@ -77,6 +77,12 @@
                 <input type="text" name="sub_bagian" value="{{ old('sub_bagian', $user->sub_bagian) }}" required
                     class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg outline-none focus:ring-2 focus:border-blue-500 transition-colors">
             </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Lokasi Kerja</label>
+                <input type="text" name="lokasi_kerja" value="{{ old('lokasi_kerja', $user->lokasi_kerja) }}" required placeholder="Contoh: Jakarta / Head Office"
+                    class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg outline-none focus:ring-2 focus:border-blue-500 transition-colors">
+            </div>
         </div>
 
         <!-- Tanda Tangan Sections -->

@@ -3,29 +3,32 @@
 @section('header_title', 'Dashboard Pimpinan')
 
 @section('content')
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Ringkasan Lembur Karyawan</h1>
-    <p class="text-sm text-gray-500 mt-1">Pantau statistik karyawan dengan intensitas lembur tertinggi yang telah disetujui (Approved).</p>
+<div class="mb-8">
+    <h1 class="text-3xl font-extrabold text-slate-800 font-outfit uppercase tracking-tight">Ringkasan Lembur Karyawan</h1>
+    <p class="text-sm text-slate-500 mt-1 font-medium italic opacity-80">Pantau statistik karyawan dengan intensitas lembur tertinggi yang telah disetujui (Approved).</p>
 </div>
 
 <!-- Dashboard Metric Cards -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
-        <div class="text-gray-500 text-sm font-semibold mb-1">Total Jam (Disetujui)</div>
-        <div class="text-3xl font-bold text-emerald-600">{{ $totalApproved }} <span class="text-lg font-medium text-gray-400">Jam</span></div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="bg-indigo-600 rounded-[2rem] shadow-[0_10px_30px_rgba(79,70,229,0.3)] p-8 flex flex-col justify-center items-center text-white transform hover:scale-105 transition-transform duration-300">
+        <div class="text-indigo-100 text-xs font-bold mb-2 uppercase tracking-widest opacity-80">Total Jam (Disetujui)</div>
+        <div class="text-4xl font-extrabold font-outfit">{{ $totalApproved }} <span class="text-sm font-medium opacity-60">JAM</span></div>
     </div>
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
-        <div class="text-gray-500 text-sm font-semibold mb-1">Total Jam (Menunggu)</div>
-        <div class="text-3xl font-bold text-yellow-500">{{ $totalWaiting }} <span class="text-lg font-medium text-gray-400">Jam</span></div>
+    <div class="bg-slate-900 rounded-[2rem] shadow-[0_10px_30px_rgba(15,23,42,0.2)] p-8 flex flex-col justify-center items-center text-white transform hover:scale-105 transition-transform duration-300 border border-slate-800">
+        <div class="text-slate-400 text-xs font-bold mb-2 uppercase tracking-widest opacity-80">Total Jam (Menunggu)</div>
+        <div class="text-4xl font-extrabold font-outfit text-yellow-400">{{ $totalWaiting }} <span class="text-sm font-medium opacity-60 text-slate-500">JAM</span></div>
     </div>
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
-        <div class="text-gray-500 text-sm font-semibold mb-1">Total Jam (Ditolak)</div>
-        <div class="text-3xl font-bold text-red-500">{{ $totalRejected }} <span class="text-lg font-medium text-gray-400">Jam</span></div>
+    <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-8 flex flex-col justify-center items-center transform hover:scale-105 transition-transform duration-300">
+        <div class="text-slate-500 text-xs font-bold mb-2 uppercase tracking-widest opacity-80">Total Jam (Ditolak)</div>
+        <div class="text-4xl font-extrabold font-outfit text-slate-800">{{ $totalRejected }} <span class="text-sm font-medium opacity-40 text-slate-400">JAM</span></div>
     </div>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
-    <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Top 10 Karyawan Lembur Tertinggi</h2>
+<div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-10 mb-8 overflow-hidden">
+    <div class="flex items-center justify-between mb-8 border-b border-slate-100 pb-6">
+        <h2 class="text-xl font-extrabold text-slate-800 font-outfit uppercase tracking-tight">Top 10 Karyawan Lembur</h2>
+        <span class="px-4 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold uppercase tracking-widest border border-indigo-100">Berdasarkan Total Jam Disetujui</span>
+    </div>
     
     @if(count($data) > 0)
         <!-- Chart Container -->

@@ -23,8 +23,8 @@ class AdminController extends Controller
         $chartData = $chartQuery->values()->all();
         
         // Daftar 5 user paling sering lembur
-        $topUsers = Overtime::select('nama', 'bagian', DB::raw('count(*) as total'))
-            ->groupBy('nama', 'bagian')
+        $topUsers = Overtime::select('employee_name as nama', 'bagian', DB::raw('count(*) as total'))
+            ->groupBy('employee_name', 'bagian')
             ->orderByDesc('total')
             ->take(5)
             ->get();

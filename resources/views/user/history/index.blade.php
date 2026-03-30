@@ -4,29 +4,29 @@
 
 @section('content')
 <!-- Dashboard Cards -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 max-w-6xl mx-auto">
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
-        <div class="text-gray-500 text-sm font-semibold mb-1">Total Jam (Disetujui)</div>
-        <div class="text-3xl font-bold text-emerald-600">{{ $totalApproved }} <span class="text-lg font-medium text-gray-400">Jam</span></div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 max-w-6xl mx-auto">
+    <div class="bg-indigo-600 rounded-[2rem] shadow-[0_10px_30px_rgba(79,70,229,0.3)] p-8 flex flex-col justify-center items-center text-white transform hover:scale-105 transition-transform duration-300">
+        <div class="text-indigo-100 text-xs font-bold mb-2 uppercase tracking-widest opacity-80">Total Jam (Disetujui)</div>
+        <div class="text-4xl font-extrabold font-outfit">{{ $totalApproved }} <span class="text-sm font-medium opacity-60">JAM</span></div>
     </div>
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
-        <div class="text-gray-500 text-sm font-semibold mb-1">Total Jam (Menunggu)</div>
-        <div class="text-3xl font-bold text-yellow-500">{{ $totalWaiting }} <span class="text-lg font-medium text-gray-400">Jam</span></div>
+    <div class="bg-slate-900 rounded-[2rem] shadow-[0_10px_30px_rgba(15,23,42,0.2)] p-8 flex flex-col justify-center items-center text-white transform hover:scale-105 transition-transform duration-300">
+        <div class="text-slate-400 text-xs font-bold mb-2 uppercase tracking-widest opacity-80">Total Jam (Menunggu)</div>
+        <div class="text-4xl font-extrabold font-outfit text-yellow-400">{{ $totalWaiting }} <span class="text-sm font-medium opacity-60 text-slate-500">JAM</span></div>
     </div>
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
-        <div class="text-gray-500 text-sm font-semibold mb-1">Total Jam (Ditolak)</div>
-        <div class="text-3xl font-bold text-red-500">{{ $totalRejected }} <span class="text-lg font-medium text-gray-400">Jam</span></div>
+    <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-8 flex flex-col justify-center items-center transform hover:scale-105 transition-transform duration-300">
+        <div class="text-slate-500 text-xs font-bold mb-2 uppercase tracking-widest opacity-80">Total Jam (Ditolak)</div>
+        <div class="text-4xl font-extrabold font-outfit text-slate-800">{{ $totalRejected }} <span class="text-sm font-medium opacity-40 text-slate-400">JAM</span></div>
     </div>
 </div>
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden max-w-6xl mx-auto">
-    <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+    <div class="px-8 py-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
         <div>
-            <h2 class="text-xl font-bold text-gray-800">Daftar Pengajuan Lembur Anda</h2>
-            <p class="text-sm text-gray-500 mt-1">Pantau status dari semua pengajuan lembur yang telah Anda buat.</p>
+            <h2 class="text-xl font-extrabold text-slate-800 font-outfit uppercase tracking-tight">Daftar Pengajuan Lembur</h2>
+            <p class="text-sm text-slate-500 mt-1 font-medium">Pantau status dari semua pengajuan lembur yang telah Anda buat.</p>
         </div>
-        <a href="{{ route('overtime.create') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm">
-            + Buat Pengajuan
+        <a href="{{ route('overtime.create') }}" class="px-6 py-3 bg-indigo-600 hover:bg-slate-900 text-white text-sm font-bold rounded-xl transition-all shadow-lg hover:shadow-indigo-500/20 active:scale-95 uppercase tracking-wider">
+            + Buat Baru
         </a>
     </div>
 

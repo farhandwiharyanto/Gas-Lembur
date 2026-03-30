@@ -22,6 +22,12 @@ BAGIAN 1: TASK CHECKLIST (DAFTAR TUGAS & FITUR UTAMA)
 - [x] Buat Dashboard Admin & Endpoint Approval
 - [x] Uji fungsionalitas keseluruhan
 
+## Tahap 11: Docker Custom & Migrasi PostgreSQL (Selesai)
+- [x] Implementasi Docker Multi-Container (PHP-FPM, Nginx, Node/Vite, PostgreSQL, Adminer).
+- [x] Konfigurasi PHP 8.4 dengan ekstensi: `pdo_pgsql`, `intl`, `gd`, `zip`.
+- [x] Migrasi Skema dan Data dari SQLite (`laravel` file) ke PostgreSQL.
+- [x] Setup monitoring database menggunakan Adminer di port `8082`.
+
 ## Tahap 3: Modul Lanjutan Dashboard Admin (Selesai)
 - [x] Refaktor layout admin agar memiliki *Sidebar* navigasi
 - [x] **Halaman Dashboard/Chart**: Bar Chart total lembur per bagian menggunakan Chart.js
@@ -435,3 +441,161 @@ Pembaruan terkini pada sistem mencakup fitur krusial berikut:
 1. **Unduh Otomatis PDF**: Tombol Cetak (Print) kini sudah dibekali teknologi `laravel-dompdf`. Ketika di-klik, alih-alih menampilkan _new window_ browser biasa, peramban akan langsung mengunduh/menyimpan file berekstensi `.pdf`.
 2. **Impor Tanda Tangan**: Kode penarikan tanda tangan berformat _base64_ maupun _image path_ khusus milik akun Karyawan (pengaju) dan akun Pimpinan di departemen (*bagian*) masing-masing telah diimplementasikan ke dalam struktur cetak tersebut.
 3. **Fitur Edit Pengajuan**: Khusus bagi pengajuan lembur yang berstatus *Waiting* (atau *Pending*), Karyawan akan melihat tombol **Edit** baru (ikon kuning) di samping tombol Cetak pada tabel halaman History mereka. Menekan tombol ini akan me-*load* ulang formulir pengajuan dengan seluruh data *existing* siap diubah. Begitu status berubah menjadi **Approved**, tombol Edit tidak akan ditampilkan.
+
+
+================================================================================
+BAGIAN 8: PANDUAN DOCKER & POSTGRESQL (ARCHITECTURE & COMMANDS)
+================================================================================
+
+Sistem Gas-Lembur kini telah sepenuhnya dikontainerisasi menggunakan Docker untuk kemudahan pengembangan (Development) dan pemantauan (Monitoring).
+
+### 1. Layanan & Arsitektur Docker (5 Kontainer)
+--------------------------------------------------------------------------------
+- **[app] (Laravel Backend)**: 
+  Menjalankan PHP 8.4-FPM. Mengelola logika bisnis, kalkulasi jam lembur, dan integrasi LDAP/SNI.
+- **[web] (Nginx Web Server)**: 
+  Berjalan di Port **8000**. Menerima request dari browser dan menghubungkannya ke kontainer 'app'.
+- **[vite] (Frontend Dev Server)**: 
+  Berjalan di Port **5173**. Menangani Hot Reloading untuk tampilan frontend agar perubahan kode langsung terlihat.
+- **[postgresql] (Database Utama)**: 
+  PostgreSQL 16. Menggunakan volume `gas-lembur-db-data` agar data tetap tersimpan permanen. 
+  Akses via host tersedia di Port **5433** (localhost:5433).
+- **[adminer] (Database UI)**: 
+  Alat bantu visual untuk melihat isi database via browser di Port **8082**.
+
+### 2. Riwayat Pengembangan Terkini (Phases)
+--------------------------------------------------------------------------------
+- **FASE 11: Dockerization & Migrasi Database PostgreSQL**
+  * Kontainerisasi penuh menggunakan Docker (5 Containers: app, web, vite, postgresql, adminer).
+  * Migrasi database dari SQLite ke PostgreSQL 16 secara aman.
+  * Konfigurasi volume data agar database tetap tersimpan permanen.
+  * Akses monitoring database melalui Adminer di port 8082.
+
+- **FASE 12: Penambahan Fitur "Lokasi Kerja" (Work Location)**
+  * Eskalasi skema tabel `users` dan `overtimes` untuk menyertakan kolom `lokasi_kerja`.
+  * Integrasi field "Lokasi Kerja" pada formulir Profil Karyawan (Edit Profile) agar user dapat memperbarui lokasi kerja masing-masing.
+  * Penambahan fungsionalitas bagi Admin untuk mengelola Lokasi Kerja user melalui menu Management Pengguna.
+  * Sinkronisasi otomatis "Lokasi Kerja" ke dalam Formulir Lembur (Read-only) untuk memastikan konsistensi data saat pengajuan.
+
+- **FASE 13: SQL Fix & Branding Overhaul (Premium UI)**
+  * Perbaikan `QueryException` pada PostgreSQL dengan mengubah tipe data kolom `total_jam` menjadi `decimal(8,2)` melalui migrasi kustom.
+  * Implementasi attribute casting `total_jam` pada model `Overtime` untuk konsistensi perhitungan angka di level aplikasi.
+  * Pembaruan identitas visual aplikasi: Desain logo baru "Gas-Lembur" yang modern dan profesional.
+  * Transformasi UI seluruh Portal (User, Admin, Pimpinan) menggunakan palet warna premium (Slate-950 / Slate-900 / Indigo) dengan efek glassmorphism pada halaman Login.
+  * Penyekarasan favicon dan metadata aplikasi dengan logo baru.
+
+- **FASE 14: Bugfix Dashboard Admin (Column Nama)**
+  * Perbaikan `QueryException` pada Dashboard Admin akibat referensi kolom `nama` yang tidak ada di tabel `overtimes`.
+  * Penyesuaian query di `AdminController` menggunakan `employee_name` dengan alias `nama` untuk menjaga kompatibilitas dengan view Blade.
+
+- **FASE 15: Sanity Check & Final Visual Cleanup**
+  * Sinkronisasi branding total pada template Cetak PDF (Surat Tugas Lembur) dengan logo Gas-Lembur dan layout profesional.
+  * Pemolesan UI (Visual Polish) pada Formulir Lembur dan Dashboard Riwayat agar sepenuhnya menggunakan tema Premium Slate/Indigo.
+  * Verifikasi logika perhitungan jam lembur otomatis (Frontend JS) untuk penanganan lintas tengah malam (cross-midnight).
+  * Audit menyeluruh terhadap integritas data PostgreSQL (Decimal conversion & Attribute Casting).
+
+### 3. Cara Menjalankan (Getting Started)
+--------------------------------------------------------------------------------
+1. Pastikan Docker Desktop dalam keadaan menyala.
+2. Jalankan perintah berikut di Terminal:
+   ```bash
+   docker compose up -d
+   ```
+3. Tunggu hingga semua status kontainer `Started / Running`.
+4. Akses Aplikasi di: `http://localhost:8000`
+
+### 3. Monitoring & Akses Database
+--------------------------------------------------------------------------------
+Ada dua cara untuk mengakses database:
+
+[A] Melalui Browser (Adminer - Akses Internal Jaringan Docker):
+- **URL**: `http://localhost:8082`
+- **System**: `PostgreSQL`
+- **Server**: `postgresql` (Gunakan nama service ini karena Adminer sedang berada di dalam Docker)
+- **Username**: `user`
+- **Password**: `password`
+- **Database**: `gas_lembur_db`
+
+[B] Melalui Aplikasi Desktop (DBeaver / Postico - Akses Eksternal Host):
+- **Host**: `localhost` (Gunakan localhost karena DBeaver berada di luar Docker)
+- **Port**: **5433** (Wajib 5433, karena port host dipetakan ke 5433)
+- **Database**: `gas_lembur_db`
+- **Username**: `user`
+- **Password**: `password`
+
+### 4. Perintah Dasar Docker (Cheatsheet)
+--------------------------------------------------------------------------------
+- **Menjalankan semua layanan**: `docker compose up -d`
+- **Menghentikan layanan**: `docker compose stop`
+- **Menyalakan kembali layanan**: `docker compose start`
+- **Mematikan & Hapus Container**: `docker compose down`
+- **Melihat Log (Real-time)**: `docker compose logs -f`
+- **Rebuild (Jika ubah Dockerfile)**: `docker compose up -d --build`
+- **Masuk ke Terminal Kontainer**: `docker compose exec app sh`
+
+--------------------------------------------------------------------------------
+**STATUS DOCKER:** AKTIF & TERKONFIGURASI (PostgreSQL 16)
+
+================================================================================
+LAMPIRAN: RIWAYAT PROMPT, WORKFLOW & DETAIL IMPLEMENTASI (SESI INI)
+================================================================================
+
+Berikut adalah catatan detail mengenai permintaan user (prompt), tantangan teknis,
+dan solusi yang diimplementasikan selama sesi pengembangan ini (Fase 12 - 15).
+
+--------------------------------------------------------------------------------
+SESI A: FITUR LOKASI KERJA & MIGRASI POSTGRESQL (FASE 12)
+--------------------------------------------------------------------------------
+**Prompt User:**
+1. "tambahkan juga untuk databasenya juga yaa menggunakan postgree agar bisa di monitoring via database dan data yang sekarang tolong migrasikan ke table postgree tersebut"
+2. "tolong tambahkan kolom lokasi kerja di semua user dan kolom yang ada agar masuk ke database dan untuk pengisiannya sama seperti kolom yang lainnya ada di menu profile"
+
+**Workflow & Hasil:**
+- Konfigurasi `docker-compose.yml` untuk PostgreSQL 16 dan Adminer.
+- Pembuatan migrasi untuk kolom `lokasi_kerja` di tabel `users`.
+- Integrasi `lokasi_kerja` pada:
+  * Profile Edit (User)
+  * Management Pengguna (Admin)
+  * Form Lembur Otomatis (Read-only)
+
+--------------------------------------------------------------------------------
+SESI B: SQL BUGFIX & PREMIUM BRANDING (FASE 13)
+--------------------------------------------------------------------------------
+**Prompt User:**
+1. "SQLSTATE[42883]: Undefined function: 7 ERROR: function sum(character varying) does not exist (di /history)"
+2. "untuk logonya tolong ubah dan samakan percis dengan yang ada di mirror_myla tetapi untuk kata2nya bedakan yaitu nama aplikasinya Gas-Lembur"
+
+**Workflow & Hasil:**
+- **SQL Fix**: Mengubah tipe `total_jam` dari `varchar` ke `decimal(8,2)` dengan explicit casting di migrasi untuk kompatibilitas PostgreSQL `SUM()`.
+- **Branding**: 
+  * Pembuatan Logo "Gas-Lembur" baru (`public/images/logo-gas-lembur.png`).
+  * Modernisasi Layout User, Admin, dan Pimpinan (Tema Slate-900 / Indigo).
+  * Renovasi halaman Login dengan efek Glassmorphism.
+
+--------------------------------------------------------------------------------
+SESI C: BUGFIX DASHBOARD ADMIN (FASE 14)
+--------------------------------------------------------------------------------
+**Prompt User:**
+"cek di role admin, waktu mau login dan berhasil masuk muncul error: SQLSTATE[42703]: Undefined column: 7 ERROR: column 'nama' does not exist"
+
+**Workflow & Hasil:**
+- Identifikasi masalah pada query "Top Users" di `AdminController@index`.
+- Merubah referensi kolom dari `nama` menjadi `employee_name` (nama kolom aktual di DB).
+- Menggunakan alias `employee_name as nama` untuk menjaga kompatibilitas dengan Blade template yang sudah ada.
+
+--------------------------------------------------------------------------------
+SESI D: FINAL CLEANUP & SANITY CHECK (FASE 15)
+--------------------------------------------------------------------------------
+**Prompt User:**
+"tolong cek semua file yang ada agar dapat berfungsi semuanya sebelum saya ada tambahan dan perbaikan kembali di aplikasinya"
+
+**Workflow & Hasil:**
+- **Audit Cetak PDF**: Mengganti header lama (Lintas Media Danawa) menjadi "Gas-Lembur" pada file `overtime/print.blade.php`.
+- **Visual Polish**: Menyelaraskan seluruh tombol dan card di History & Dashboard agar menggunakan tema Premium Indigo.
+- **Logika Check**: Verifikasi perhitungan jam lembur pada frontend JS agar tetap akurat saat melewati pukul 00:00.
+- **Final Result**: Sistem dinyatakan stabil dan konsisten secara visual (identitas Gas-Lembur).
+
+================================================================================
+DOKUMEN INI TERAKHIR DIPERBARUI PADA: 31 MARET 2026
+================================================================================
+

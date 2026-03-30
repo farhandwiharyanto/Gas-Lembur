@@ -23,6 +23,7 @@ class UserProfileController extends Controller
             'divisi' => 'required|string|max:100',
             'bagian' => 'required|string|max:100',
             'sub_bagian' => 'required|string|max:100',
+            'lokasi_kerja' => 'required|string|max:100',
             'tanda_tangan' => 'nullable|image|mimes:png,jpg,jpeg|max:2048', // Allow image upload up to 2MB
         ]);
 
@@ -45,6 +46,7 @@ class UserProfileController extends Controller
             'divisi' => $request->divisi,
             'bagian' => $request->bagian,
             'sub_bagian' => $request->sub_bagian,
+            'lokasi_kerja' => $request->lokasi_kerja,
             'tanda_tangan' => $signatureData,
         ]);
 

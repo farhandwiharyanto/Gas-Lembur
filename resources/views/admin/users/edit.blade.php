@@ -48,6 +48,11 @@
                 <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Administrator</option>
             </select>
         </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi Kerja</label>
+            <input type="text" name="lokasi_kerja" value="{{ old('lokasi_kerja', $user->lokasi_kerja) }}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="Contoh: Jakarta / Head Office">
+        </div>
         
         <div class="border-t border-gray-200 mt-6 pt-4">
             <h3 class="text-sm font-bold text-gray-800 mb-2">Ubah Password (Opsional)</h3>

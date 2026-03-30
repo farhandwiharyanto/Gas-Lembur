@@ -7,14 +7,14 @@
         body { margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #000; }
         .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 40px; box-sizing: border-box; }
         
-        .header { display: flex; align-items: flex-start; margin-bottom: 40px; }
-        .logo-img { width: 50px; height: 50px; background-color: #2563eb; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; align-items: center; justify-content: center; margin-right: 15px; position:relative; }
-        .logo-inner { width: 25px; height: 25px; background-color: white; border-radius: 50%; border: 4px solid #f97316; }
+        .header { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #1e293b; padding-bottom: 20px; }
+        .logo-img { width: 60px; height: 60px; margin-right: 20px; }
+        .logo-img img { width: 60px; height: 60px; object-fit: contain; }
         .logo-text { display: flex; flex-direction: column; justify-content: center; }
-        .logo-title { font-size: 24px; font-weight: bold; color: #1e3a8a; letter-spacing: -0.5px; }
-        .logo-subtitle { font-size: 13px; color: #4b5563; }
+        .logo-title { font-size: 28px; font-weight: 800; color: #0f172a; letter-spacing: -1px; text-transform: uppercase; font-family: 'Helvetica', sans-serif; }
+        .logo-subtitle { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-top: -5px; }
         
-        .title { text-align: center; text-decoration: underline; font-weight: bold; font-size: 18px; margin-bottom: 40px; text-transform: uppercase; }
+        .title { text-align: center; font-weight: 800; font-size: 20px; margin-bottom: 35px; color: #0f172a; border: 2px solid #0f172a; padding: 10px; display: inline-block; width: 100%; box-sizing: border-box; }
         .section { margin-bottom: 24px; line-height: 1.5; }
         .row { display: flex; margin-bottom: 8px; }
         .label { width: 180px; }
@@ -44,11 +44,16 @@
         <!-- Logo Header -->
         <div class="header">
             <div class="logo-img">
-                <div class="logo-inner"></div>
+                @php
+                    $logoPath = public_path('images/logo-gas-lembur.png');
+                    $logoData = base64_encode(file_get_contents($logoPath));
+                    $logoSrc = 'data:image/png;base64,' . $logoData;
+                @endphp
+                <img src="{{ $logoSrc }}" alt="Logo">
             </div>
             <div class="logo-text">
-                <div class="logo-title">lintas media danawa</div>
-                <div class="logo-subtitle">Your AI Smart Solutions</div>
+                <div class="logo-title">GAS-LEMBUR</div>
+                <div class="logo-subtitle">Sistem Informasi Lembur Karyawan</div>
             </div>
         </div>
 
