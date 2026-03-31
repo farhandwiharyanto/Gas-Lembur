@@ -83,6 +83,16 @@
                         class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder-slate-400">
                 </div>
                 <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Tanggal Masuk</label>
+                    <input type="date" name="tanggal_masuk" id="tanggal_masuk" value="{{ old('tanggal_masuk', $overtime->tanggal_masuk ?? date('Y-m-d')) }}" required
+                        class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Tanggal Keluar</label>
+                    <input type="date" name="tanggal_keluar" id="tanggal_keluar" value="{{ old('tanggal_keluar', $overtime->tanggal_keluar ?? date('Y-m-d')) }}" required
+                        class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                </div>
+                <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Jam Masuk</label>
                     <input type="time" name="jam_masuk" id="jam_masuk" value="{{ old('jam_masuk', $overtime->jam_masuk ?? '') }}" required
                         class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
@@ -121,14 +131,18 @@
             <legend class="text-sm font-semibold text-gray-600 bg-white px-3 py-1 rounded-md border border-gray-200 shadow-sm ml-4">Tanda Tangan</legend>
             <div class="mt-2 text-center">
                 @if(auth()->user()->tanda_tangan)
-                    <div class="inline-block border border-gray-200 rounded-lg p-2 bg-white shadow-sm mb-3">
-                        <img src="{{ auth()->user()->tanda_tangan }}" alt="Tanda Tangan" class="h-32 object-contain">
+                    @php
+                        $sigPath = auth()->user()->tanda_tangan;
+                        $sigUrl = str_starts_with($sigPath, '/') ? asset($sigPath) : asset('storage/' . $sigPath);
+                    @endphp
+                    <div class="inline-block border-2 border-indigo-100 rounded-2xl p-4 bg-white shadow-md mb-3 transition-transform hover:scale-105">
+                        <img src="{{ $sigUrl }}" alt="Tanda Tangan" class="h-32 object-contain" id="signature-preview">
                     </div>
-                    <p class="text-sm text-green-600 font-medium flex items-center justify-center">
+                    <p class="text-sm text-indigo-600 font-bold flex items-center justify-center uppercase tracking-tight">
                         <svg class="w-5 h-5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        Tanda tangan otomatis ditarik dari profil Anda.
+                        Tanda tangan terverifikasi dari profil Anda
                     </p>
-                    <input type="hidden" name="tanda_tangan" value="{{ auth()->user()->tanda_tangan }}">
+                    <input type="hidden" name="tanda_tangan" value="{{ $sigPath }}">
                 @else
                     <div class="p-4 border-2 border-dashed border-red-200 rounded-lg bg-red-50">
                         <p class="text-red-600 text-sm font-medium mb-3">Anda belum memiliki tanda tangan di profil.</p>
@@ -162,27 +176,37 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const tanggalMasuk = document.getElementById('tanggal_masuk');
+    const tanggalKeluar = document.getElementById('tanggal_keluar');
     const jamMasuk = document.getElementById('jam_masuk');
     const jamKeluar = document.getElementById('jam_keluar');
     const totalJam = document.getElementById('total_jam');
-
+ 
     function calculateTotal() {
-        if (jamMasuk.value && jamKeluar.value) {
-            let masuk = new Date('1970-01-01T' + jamMasuk.value + ':00');
-            let keluar = new Date('1970-01-01T' + jamKeluar.value + ':00');
+        if (tanggalMasuk.value && jamMasuk.value && tanggalKeluar.value && jamKeluar.value) {
+            let start = new Date(tanggalMasuk.value + 'T' + jamMasuk.value + ':00');
+            let end = new Date(tanggalKeluar.value + 'T' + jamKeluar.value + ':00');
             
-            // Handle cross midnight
-            if (keluar < masuk) {
-                keluar.setDate(keluar.getDate() + 1);
+            if (end > start) {
+                let diffHours = (end - start) / (1000 * 60 * 60);
+                totalJam.value = Math.round(diffHours);
+            } else {
+                totalJam.value = '0';
             }
-            
-            let diffHours = (keluar - masuk) / (1000 * 60 * 60);
-            totalJam.value = diffHours.toFixed(2);
         } else {
-            totalJam.value = '';
+            totalJam.value = '0';
         }
     }
-
+ 
+    // Auto sync tanggal keluar with tanggal masuk if it's currently the same or empty
+    tanggalMasuk.addEventListener('change', function() {
+        if (!tanggalKeluar.value || tanggalKeluar.value < tanggalMasuk.value) {
+            tanggalKeluar.value = tanggalMasuk.value;
+        }
+        calculateTotal();
+    });
+ 
+    tanggalKeluar.addEventListener('change', calculateTotal);
     jamMasuk.addEventListener('change', calculateTotal);
     jamKeluar.addEventListener('change', calculateTotal);
 });

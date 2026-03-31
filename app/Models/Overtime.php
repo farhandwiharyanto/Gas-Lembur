@@ -15,6 +15,8 @@ class Overtime extends Model
         'direktorat',
         'lokasi_kerja',
         'nama_lemburan',
+        'tanggal_masuk',
+        'tanggal_keluar',
         'jam_masuk',
         'jam_keluar',
         'total_jam',

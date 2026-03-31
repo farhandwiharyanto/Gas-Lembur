@@ -6,8 +6,7 @@
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
     <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-end">
         <div>
-            <h2 class="text-xl font-bold text-gray-800">Menunggu Persetujuan Anda (Approvals)</h2>
-            <p class="text-sm text-gray-500 mt-1">Antrean pengajuan lembur yang berada di Bagian fungsional Anda.</p>
+            <h2 class="text-xl font-extrabold text-gray-800 font-outfit uppercase tracking-tight">Menunggu Approval Pimpinan</h2>
         </div>
     </div>
     
@@ -41,37 +40,38 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="text-sm font-semibold text-gray-900">{{ $overtime->nama_lemburan ?: '-' }}</div>
-                            <div class="text-xs text-gray-500">Wkt: {{ $overtime->jam_masuk ?: '-' }} s/d {{ $overtime->jam_keluar ?: '-' }} ({{ $overtime->total_jam ?: '0' }} Jam)</div>
-                            <div class="text-xs text-gray-500 truncate max-w-xs">Tiket: {{ $overtime->nomor_tiket ?: '-' }} | Req: {{ $overtime->pemberi_lembur ?: '-' }}</div>
+                            <div class="text-xs text-gray-600 font-bold">
+                                {{ \Carbon\Carbon::parse($overtime->tanggal_masuk)->format('d M') }} ({{ $overtime->jam_masuk }}) s/d 
+                                {{ \Carbon\Carbon::parse($overtime->tanggal_keluar)->format('d M') }} ({{ $overtime->jam_keluar }})
+                            </div>
+                            <div class="text-[11px] text-indigo-600 font-extrabold uppercase mt-1 tracking-tighter">Total: {{ round($overtime->total_jam) ?: '0' }} Jam</div>
+                            <div class="text-[10px] text-gray-400 truncate max-w-xs uppercase mt-1 italic">Tiket: {{ $overtime->nomor_tiket ?: '-' }} | Req: {{ $overtime->pemberi_lembur ?: '-' }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-[10px] font-bold uppercase tracking-widest">
                             @if($overtime->status == 'waiting' || $overtime->status == 'pending')
-                                <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-yellow-200 shadow-sm">
-                                    Waiting
+                                <span class="bg-yellow-100 text-yellow-800 px-2.5 py-1 rounded-full border border-yellow-200">
+                                    MENUNGGU
                                 </span>
                             @elseif($overtime->status == 'approved')
-                                <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-200 shadow-sm">
-                                    Approved
+                                <span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full border border-emerald-200">
+                                    DISETUJUI
                                 </span>
                             @else
-                                <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-red-200 shadow-sm">
-                                    Rejected
+                                <span class="bg-red-100 text-red-800 px-2.5 py-1 rounded-full border border-red-200">
+                                    DITOLAK
                                 </span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <div class="flex justify-center items-center space-x-2">
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-xs font-bold uppercase tracking-widest">
+                            <div class="flex justify-center flex-wrap items-center gap-2">
                                 <form action="{{ route('pimpinan.approve', $overtime->id) }}" method="POST" class="inline">
                                     @csrf @method('PATCH')
-                                    <button type="submit" onclick="return confirm('Setujui lemburan ini?')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-md shadow-sm transition-colors">Setuju</button>
+                                    <button type="submit" onclick="return confirm('Setujui lemburan ini?')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-extrabold rounded-lg shadow-sm border border-emerald-500 transition-all active:scale-95">SETUJU</button>
                                 </form>
                                 <form action="{{ route('pimpinan.reject', $overtime->id) }}" method="POST" class="inline">
                                     @csrf @method('PATCH')
-                                    <button type="submit" onclick="return confirm('Tolak lemburan ini?')" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md shadow-sm transition-colors">Tolak</button>
+                                    <button type="submit" onclick="return confirm('Tolak lemburan ini?')" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-[10px] font-extrabold rounded-lg shadow-sm border border-red-500 transition-all active:scale-95">TOLAK</button>
                                 </form>
-                                <a href="{{ route('overtime.print', $overtime->id) }}" target="_blank" class="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 font-semibold rounded-md shadow-sm text-xs border border-blue-200 transition-colors">
-                                    Cetak
-                                </a>
                             </div>
                         </td>
                     </tr>

@@ -10,39 +10,73 @@
 
 <!-- Dashboard Metric Cards -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-    <div class="bg-indigo-600 rounded-[2rem] shadow-[0_10px_30px_rgba(79,70,229,0.3)] p-8 flex flex-col justify-center items-center text-white transform hover:scale-105 transition-transform duration-300">
-        <div class="text-indigo-100 text-xs font-bold mb-2 uppercase tracking-widest opacity-80">Total Jam (Disetujui)</div>
-        <div class="text-4xl font-extrabold font-outfit">{{ $totalApproved }} <span class="text-sm font-medium opacity-60">JAM</span></div>
+    <!-- Approved (Green) -->
+    <div class="bg-green-600 rounded-[2rem] shadow-[0_10px_30px_rgba(22,163,74,0.3)] p-8 flex flex-col justify-center items-center text-white transform hover:scale-105 transition-transform duration-300">
+        <div class="text-green-100 text-xs font-bold mb-2 uppercase tracking-widest opacity-80">Total Jam (Disetujui)</div>
+        <div class="text-4xl font-extrabold font-outfit">{{ (int)$totalApproved }} <span class="text-sm font-medium opacity-60">JAM</span></div>
     </div>
-    <div class="bg-slate-900 rounded-[2rem] shadow-[0_10px_30px_rgba(15,23,42,0.2)] p-8 flex flex-col justify-center items-center text-white transform hover:scale-105 transition-transform duration-300 border border-slate-800">
-        <div class="text-slate-400 text-xs font-bold mb-2 uppercase tracking-widest opacity-80">Total Jam (Menunggu)</div>
-        <div class="text-4xl font-extrabold font-outfit text-yellow-400">{{ $totalWaiting }} <span class="text-sm font-medium opacity-60 text-slate-500">JAM</span></div>
+    <!-- Waiting (Yellow) -->
+    <div class="bg-yellow-500 rounded-[2rem] shadow-[0_10px_30px_rgba(234,179,8,0.2)] p-8 flex flex-col justify-center items-center text-white transform hover:scale-105 transition-transform duration-300 border border-yellow-400">
+        <div class="text-yellow-100 text-xs font-bold mb-2 uppercase tracking-widest opacity-80">Total Jam (Menunggu)</div>
+        <div class="text-4xl font-extrabold font-outfit text-white">{{ (int)$totalWaiting }} <span class="text-sm font-medium opacity-60 text-white/70">JAM</span></div>
     </div>
-    <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-8 flex flex-col justify-center items-center transform hover:scale-105 transition-transform duration-300">
-        <div class="text-slate-500 text-xs font-bold mb-2 uppercase tracking-widest opacity-80">Total Jam (Ditolak)</div>
-        <div class="text-4xl font-extrabold font-outfit text-slate-800">{{ $totalRejected }} <span class="text-sm font-medium opacity-40 text-slate-400">JAM</span></div>
+    <!-- Rejected (Red) -->
+    <div class="bg-red-600 rounded-[2rem] shadow-[0_10px_30px_rgba(220,38,38,0.2)] p-8 flex flex-col justify-center items-center text-white transform hover:scale-105 transition-transform duration-300 border border-red-500">
+        <div class="text-red-100 text-xs font-bold mb-2 uppercase tracking-widest opacity-80">Total Jam (Ditolak)</div>
+        <div class="text-4xl font-extrabold font-outfit text-white">{{ (int)$totalRejected }} <span class="text-sm font-medium opacity-60 text-white/70">JAM</span></div>
     </div>
 </div>
 
-<div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-10 mb-8 overflow-hidden">
-    <div class="flex items-center justify-between mb-8 border-b border-slate-100 pb-6">
-        <h2 class="text-xl font-extrabold text-slate-800 font-outfit uppercase tracking-tight">Top 10 Karyawan Lembur</h2>
-        <span class="px-4 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold uppercase tracking-widest border border-indigo-100">Berdasarkan Total Jam Disetujui</span>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Chart Container -->
+    <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-8 overflow-hidden flex flex-col">
+        <div class="flex items-center justify-between mb-8 border-b border-slate-100 pb-6">
+            <h2 class="text-xl font-extrabold text-slate-800 font-outfit uppercase tracking-tight">Grafik Lembur 10 Teratas</h2>
+        </div>
+        
+        @if(count($data) > 0)
+            <div class="relative h-96 w-full mt-auto">
+                <canvas id="overtimeChart"></canvas>
+            </div>
+        @else
+            <div class="text-center py-12 text-gray-500 my-auto">
+                <svg class="mx-auto h-12 w-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <p>Belum ada data lembur yang disetujui.</p>
+            </div>
+        @endif
     </div>
-    
-    @if(count($data) > 0)
-        <!-- Chart Container -->
-        <div class="relative h-96 w-full">
-            <canvas id="overtimeChart"></canvas>
+
+    <!-- Table Container -->
+    <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-8 overflow-hidden flex flex-col">
+        <div class="flex items-center justify-between mb-8 border-b border-slate-100 pb-6">
+            <h2 class="text-xl font-extrabold text-slate-800 font-outfit uppercase tracking-tight">Daftar Top 10 Karyawan</h2>
         </div>
-    @else
-        <div class="text-center py-12 text-gray-500">
-            <svg class="mx-auto h-12 w-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <p>Belum ada data lembur yang disetujui untuk ditampilkan.</p>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-100">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nama Karyawan</th>
+                        <th class="px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Jam Disetujui</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    @forelse($top10 as $item)
+                    <tr>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-slate-700">{{ $item->employee_name }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-indigo-600 text-right">{{ (int)$item->total_jam }} JAM</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="2" class="px-4 py-10 text-center text-sm text-slate-400 font-medium">Belum ada data tersedia.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-    @endif
+    </div>
 </div>
 @endsection
 

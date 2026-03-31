@@ -1,6 +1,27 @@
 # DOKUMENTASI APLIKASI GAS-LEMBUR
 
 ================================================================================
+PETUNJUK UNTUK DEVELOPER (GUIDE FOR FUTURE DEVELOPERS)
+================================================================================
+Selamat datang di projek Gas-Lembur! Dokumen ini adalah "Peta Jalan" lengkap yang 
+mencatat setiap detak jantung pengembangan aplikasi ini dari nol hingga siap pakai.
+
+CARA MEMBACA DOKUMEN INI:
+1. BAGIAN 1 (Task Checklist): Gunakan ini untuk melihat status fitur secara cepat. 
+   Setiap Tahap (1 s/d 17) mewakili satu blok fungsionalitas yang sudah stabil.
+2. BAGIAN 2-5 (Technical Context): Berisi rencana teknis awal, hasil validasi, 
+   dan riwayat kendala (sangat penting dibaca agar tidak mengulangi kesalahan yang sama).
+3. BAGIAN 8 (Docker & DB): Panduan utama untuk menyalakan lingkungan kerja Anda.
+4. LAMPIRAN (Sesi G-I): Berisi revisi terbaru terkait format PDF, Multi-Tanggal, 
+   dan kebijakan Readonly Pimpinan yang baru saja selesai diimplementasikan.
+
+CATATAN PENTING UNTUK PEMELIHARAAN:
+- Gunakan `docker compose up -d` untuk menjalankan sistem.
+- Database utama adalah PostgreSQL (Pindah dari SQLite pada Fase 11).
+- Perhatikan Role-Based Access: Admin (Kelola User), Pimpinan (Readonly Approval), 
+  dan User (Input Lembur).
+
+================================================================================
 BAGIAN 1: TASK CHECKLIST (DAFTAR TUGAS & FITUR UTAMA)
 ================================================================================
 
@@ -78,6 +99,17 @@ BAGIAN 1: TASK CHECKLIST (DAFTAR TUGAS & FITUR UTAMA)
 - [x] **Cetak PDF Otomatis**: Instalasi library `laravel-dompdf`. Tombol Cetak langsung men-download (meng-generate) PDF dokumen surat tugas.
 - [x] **Import Tanda Tangan**: Memasukkan `<img>` rendering dari signature canvas ke PDF template cetak.
 - [x] **Form Edit Waiting**: Menambahkan fitur _Edit_ yang me-reuse tampilan `overtime-form.blade.php` dengan metode `PUT` dan mengisi ulang values input. Tombol dikunci (tidak tampil) setelah status beranjak dari `waiting`.
+- [x] **Tahap 16: Portal Enhancements & Bulk Operations (Selesai)**
+    - [x] **Admin**: Penambahan Top 5 List (Mini Table) di Dashboard dan pembersihan UI (hapus kolom TTD & subtitle).
+    - [x] **Pimpinan**: Pembulatan jam (integer), perbaikan chart Top 10, update warna kartu (G/Y/R), dan penambahan halaman Laporan khusus.
+    - [x] **User**: Pembuatan Dashboard modern (Line Chart), pemisahan modul di Sidebar, dan fitur Bulk Download PDF (gabungan).
+    - [x] **Global**: Standarisasi pembulatan jam lembur di seluruh portal (Frontend & Backend).
+
+- [x] **Tahap 17: Multi-Tanggal & Final PDF (Selesai)**
+    - [x] Implementasi Tanggal Masuk & Keluar terpisah.
+    - [x] Sinkronisasi "Jakarta, [Tanggal]" dengan waktu pengajuan.
+    - [x] Penyederhanaan layout PDF (Hapus Tgl. Pengajuan & Sederhanakan Durasi).
+    - [x] Pembersihan database untuk pengujian E2E final.
 
 
 ================================================================================
@@ -313,6 +345,29 @@ Jika ditanya _username_ dan _password_ di Terminal saat melakukan proses push/pu
 - (Tanda Tangan) View referensi cetak diubah dengan menyematkan tag `<img>` yang membongkar gambar tanda_tangan yang tersimpan, baik milik Karyawan maupun Pimpinan (mendukung metode base64 bawaan ttd pad).
 - (Edit Form) Menambahkan rute dan controller `edit` / `update`, menambah tombol **Edit** berwarna kuning di tabel "Riwayat Lembur" Karyawan (hanya muncul saat log status masih `waiting` atau `pending`), serta menyempurnakan `overtime-form.blade.php` agar dapat melakukan modifikasi form pengajuan yang sama tanpa membuat ID baru. Pengajuan yang sudah berstatus `approved` otomatis menjadi readonly/locked.
 
+[PROMPT 18]
+> tambahan atau perbaikan
+> - Halaman Admin
+> 1. buatkan top 5 list masing2 di bawah Total Orang Lembur, Total Lemburan Approved dan Menunggu Persetujuan agar bisa melihat detailnya (isinya hanya Nama, dan Total jamnya saja)
+> 2. di halaman Daftar Pengajuan Lembur untuk kolom tanda tangan sepertinya tidak usah di tampilkan dan untuk "Kelola dan setujui riwayat pengajuan lembur karyawan." dihilangkan saja
+> 3. di halaman Daftar Pengguna, untuk di Tambah Pengguna Baru yang "Lokasi Kerja" dan bagian "Kelola akses akun karyawan dan admin." dihilangkan saja
+> 4. di halaman Laporan Lembur, di tambahkan filter bulannya juga agar bisa download data keseluruhan per bulannya 
+> - Halaman pimpinan
+> 1. untuk di halaman dashboard dan bagian "Total Jam (Disetujui)" jangan di buat desimal, di bulatkan saja (misalnyya data existing 19 jam, munculnya hanya 19 jam saja jangan 19.0 jam)
+> 2. masih di dashboard, untuk warnanya di ubah menjadi Total Jam (Disetujui): hijau, Total Jam (Menunggu): kuning, Total Jam (Ditolak): merah
+> 3. untuk Top 10 karyawan di pimpinan kemarin sempat hilang, tolong di munculkan kembali 
+> 4. di halaman daftar pengajuan lembur pimpinan dan di riwayat disetujui, untuk bagian subtitle dan kolom "Cetak" di hilangkan (khusus pimpinan saja)
+> 5. buatkan halaman laporan untuk pimpinan agar pimpinan bisa melihat laporan per bagiannya sendiri
+> - Halaman User
+> 1. dibuatkan dashboard (seragam dengan yang lainnya biar rapih)
+> 2. ditambahkan Bulk Download PDF gabungan pada Riwayat User
+
+[IMPLEMENTASI & HASIL - PROMPT 18]
+- **Admin Portal**: Top 5 mini-tables ditambahkan pada Dashboard Admin. Menghapus kolom TTD dan teks subtitle pada Daftar Lembur & Manajemen User. Menambahkan filter periode (Bulan) pada Laporan Admin.
+- **Pimpinan Portal**: Seluruh jam lembur dibulatkan ke (int). Warna kartu dashboard disesuaikan menjadi Hijau (Approved), Kuning (Waiting), Merah (Rejected). Memperbaiki query Top 10 Employees. Membuat halaman Laporan khusus Pimpinan dengan filter periode.
+- **User Portal**: Membuat Dashboard baru dengan Line Chart (intensitas lembur 6 bulan). Menambahkan checkbox dan tombol 'Bulk Download' pada Riwayat untuk mengunduh banyak surat tugas Approved ke dalam satu file PDF gabungan.
+- **Rounding Logic**: Implementasi `Math.round()` di JS (Frontend) dan `round()` di Controller (Backend) untuk memastikan data jam lembur konsisten tanpa desimal.
+
 ================================================================================
 BAGIAN 7: LAMPIRAN ARTIFAK SISTEM (TAHAP 9 & 10)
 ================================================================================
@@ -494,6 +549,23 @@ Sistem Gas-Lembur kini telah sepenuhnya dikontainerisasi menggunakan Docker untu
   * Verifikasi logika perhitungan jam lembur otomatis (Frontend JS) untuk penanganan lintas tengah malam (cross-midnight).
   * Audit menyeluruh terhadap integritas data PostgreSQL (Decimal conversion & Attribute Casting).
 
+- [FASE 16]: Rekonstruksi Template PDF Standar LMD
+  * Rekonstruksi total template `overtime.print` dan `pdf.bulk-overtime` sesuai standar dokumen PT Lintas Media Danawa.
+  * Implementasi Header logo di pojok kiri atas, judul "SURAT TUGAS LEMBUR" dengan garis bawah tebal.
+  * Penyekarasan kolom identitas (Nama, NIK, Bagian) menggunakan titik dua yang sejajar vertikal.
+  * Penambahan tanda tangan dinamis untuk User (Pengaju) dan Pimpinan terkait berdasarkan departemen/bagian.
+
+- [FASE 17]: Lokalisasi Bahasa Indonesia (Full Indonesian UI)
+  * Migrasi seluruh label antarmuka dari Bahasa Inggris ke Bahasa Indonesia (APP_LOCALE=id).
+  * Penerjemahan status pengajuan: Waiting/Pending → **MENUNGGU**, Approved → **DISETUJUI**, Rejected → **DITOLAK**.
+  * Penyekarasan format tanggal menggunakan `translatedFormat` untuk tampilan bulan dalam Bahasa Indonesia.
+
+- [FASE 18]: Penyesuaian Role & Readonly Pimpinan
+  * Pembatasan fitur unduh PDF: Hanya role **User** dan **Admin** yang memiliki akses cetak/unduh.
+  * Role **Pimpinan** diatur menjadi **Readonly** (Hanya Baca) pada halaman Riwayat dan Approvals.
+  * Penghapusan filter laporan (Menu Reports) dari portal Pimpinan untuk menyederhanakan akses.
+  * Peningkatan UX: Penambahan logika "Select All" dan tombol unduh yang otomatis nonaktif jika tidak ada data dipilih (Admin/User).
+
 ### 3. Cara Menjalankan (Getting Started)
 --------------------------------------------------------------------------------
 1. Pastikan Docker Desktop dalam keadaan menyala.
@@ -595,7 +667,70 @@ SESI D: FINAL CLEANUP & SANITY CHECK (FASE 15)
 - **Logika Check**: Verifikasi perhitungan jam lembur pada frontend JS agar tetap akurat saat melewati pukul 00:00.
 - **Final Result**: Sistem dinyatakan stabil dan konsisten secara visual (identitas Gas-Lembur).
 
-================================================================================
-DOKUMEN INI TERAKHIR DIPERBARUI PADA: 31 MARET 2026
-================================================================================
+--------------------------------------------------------------------------------
+SESI E: STANDAR PDF LMD & SIGNATURE LOGIC (FASE 16)
+--------------------------------------------------------------------------------
+**Prompt User:**
+"Tolong buatkan ulang dokumen 'Surat Tugas Lembur' dari PT Lintas Media Danawa... Header logo pojok kiri atas... tanda tangan sejajar..."
 
+**Workflow & Hasil:**
+- Rekonstruksi template menggunakan *Table-based layout* agar presisi saat di-render oleh `dompdf`.
+- Penyejajaran titik dua (:) menggunakan kolom tabel tambahan.
+- Implementasi `public_path` untuk pemanggilan file tanda tangan dari storage agar terbaca oleh library PDF.
+
+--------------------------------------------------------------------------------
+SESI F: LOKALISASI BAHASA (FASE 17)
+--------------------------------------------------------------------------------
+**Prompt User:**
+"buat yang memakai bahasa inggris tolong ubah menjadi bahasa indonesia ya"
+
+**Workflow & Hasil:**
+- Update `config/app.php` (Locale ke 'id').
+- Hardcoded translation pada seluruh file Blade utama (Admin, Pimpinan, User).
+- Penyeragaman status huruf kapital tebal (MENUNGGU, DISETUJUI, DITOLAK).
+
+--------------------------------------------------------------------------------
+SESI G: READONLY PIMPINAN & UI POLISH (FASE 18)
+--------------------------------------------------------------------------------
+**Prompt User:**
+"di pimpinan tidak perlu ada downloadnya... role pimpinan tidak ada download di Riwayat Pengajuan Lembur hanya readonly"
+
+**Workflow & Hasil:**
+- Penghapusan form, checkbox, dan tombol Cetak pada portal Pimpinan.
+- Penghapusan menu Laporan dari Sidebar Pimpinan.
+- Penambahan Chart.js CDN pada layout Admin/Pimpinan untuk memperbaiki bug grafik dashboard yang hilang.
+- Optimasi JavaScript untuk penanganan Bulk Download (tombol Otomatis Disabled).
+
+
+--------------------------------------------------------------------------------
+SESI H: MULTI-TANGGAL & PDF DATES (FASE 19)
+--------------------------------------------------------------------------------
+**Prompt User:**
+1. "tolong tambahkan di halaman Buat Pengajuan Lembur, tanggalnya juga dibikin 2 tanggal (Masuk & Keluar)"
+2. "revisi di hasil download: Jakarta, [Tanggal] disesuaikan dengan Tgl. Pengajuan"
+3. "Tgl. Pengajuan di PDF dihapus dan Durasi disederhanakan."
+
+**Workflow & Hasil:**
+- **Dual-Date Support**: Menambah kolom tanggal_masuk dan tanggal_keluar pada DB & Model.
+- **Smart Calculation**: Update JS pada form agar total_jam otomatis menghitung durasi lintas hari (misal: 22:00 s/d 02:00 = 4 Jam).
+- **PDF Layout**:
+  * Menggabungkan baris Masuk/Keluar menjadi satu baris "Hari/ Tanggal" di PDF.
+  * Sinkronisasi lokasi "Jakarta, [Tanggal]" tepat mengikuti waktu submit (created_at).
+  * Penyederhanaan field "Durasi" dan penghapusan baris "Tgl. Pengajuan" sesuai request estetik user.
+- **UI Sync**: Update tampilan riwayat di User, Pimpinan, dan Admin agar menampilkan rentang tanggal dengan rapi.
+
+--------------------------------------------------------------------------------
+SESI I: DATA CLEANUP & E2E TESTING (FASE 20)
+--------------------------------------------------------------------------------
+**Prompt User:**
+1. "tolong cek semua file agar fungsinya berjalan dengan baik sebelum saya test end to end"
+2. "delete dulu data yang sekarang agar bisa testing 1 data dahulu dari awal"
+
+**Workflow & Hasil:**
+- **Sanity Check**: Audit menyeluruh pada PimpinanController, OvertimeController, dan AdminController.
+- **Database Clear**: Menjalankan perintah TRUNCATE TABLE overtimes RESTART IDENTITY CASCADE untuk membersihkan lingkungan tes.
+- **Verification**: Memastikan seluruh status (MENUNGGU, DISETUJUI, DITOLAK) dan PDF Bulk Download berfungsi sinkron tanpa data sampah.
+
+================================================================================
+DOKUMEN INI TERAKHIR DIPERBARUI PADA: 01 APRIL 2026 (FINAL DEPLOYMENT READY)
+================================================================================

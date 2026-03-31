@@ -21,6 +21,8 @@ class OvertimeController extends Controller
         $validated = $request->validate([
             'tanda_tangan' => 'required|string',
             'nama_lemburan' => 'required|string|max:255',
+            'tanggal_masuk' => 'required|date',
+            'tanggal_keluar' => 'required|date',
             'jam_masuk' => 'required',
             'jam_keluar' => 'required',
             'total_jam' => 'required|string',
@@ -48,9 +50,11 @@ class OvertimeController extends Controller
             'direktorat' => $user->direktorat,
             'lokasi_kerja' => collect([$user->lokasi_kerja])->filter()->first() ?? 'Tidak ada data', 
             'nama_lemburan' => $validated['nama_lemburan'],
+            'tanggal_masuk' => $validated['tanggal_masuk'],
+            'tanggal_keluar' => $validated['tanggal_keluar'],
             'jam_masuk' => $validated['jam_masuk'],
             'jam_keluar' => $validated['jam_keluar'],
-            'total_jam' => $validated['total_jam'],
+            'total_jam' => round($validated['total_jam']),
             'nomor_tiket' => $validated['nomor_tiket'],
             'pemberi_lembur' => $validated['pemberi_lembur'],
             'tanda_tangan' => $fileName,
@@ -83,6 +87,8 @@ class OvertimeController extends Controller
         $validated = $request->validate([
             'tanda_tangan' => 'required|string',
             'nama_lemburan' => 'required|string|max:255',
+            'tanggal_masuk' => 'required|date',
+            'tanggal_keluar' => 'required|date',
             'jam_masuk' => 'required',
             'jam_keluar' => 'required',
             'total_jam' => 'required|string',
@@ -102,9 +108,11 @@ class OvertimeController extends Controller
 
         $overtime->update([
             'nama_lemburan' => $validated['nama_lemburan'],
+            'tanggal_masuk' => $validated['tanggal_masuk'],
+            'tanggal_keluar' => $validated['tanggal_keluar'],
             'jam_masuk' => $validated['jam_masuk'],
             'jam_keluar' => $validated['jam_keluar'],
-            'total_jam' => $validated['total_jam'],
+            'total_jam' => round($validated['total_jam']),
             'nomor_tiket' => $validated['nomor_tiket'],
             'pemberi_lembur' => $validated['pemberi_lembur'],
             'tanda_tangan' => $fileName,

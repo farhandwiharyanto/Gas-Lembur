@@ -22,14 +22,39 @@ class AdminController extends Controller
         $chartLabels = $chartQuery->keys()->all();
         $chartData = $chartQuery->values()->all();
         
-        // Daftar 5 user paling sering lembur
-        $topUsers = Overtime::select('employee_name as nama', 'bagian', DB::raw('count(*) as total'))
-            ->groupBy('employee_name', 'bagian')
-            ->orderByDesc('total')
+        // 1. Top 5 Orang Lembur (Semua Status)
+        $top5All = Overtime::select('employee_name', DB::raw('SUM(total_jam) as total_jam'))
+            ->groupBy('employee_name')
+            ->orderByDesc('total_jam')
             ->take(5)
             ->get();
 
-        return view('admin.index', compact('totalUsers', 'totalApproved', 'totalPending', 'chartLabels', 'chartData', 'topUsers'));
+        // 2. Top 5 Approved
+        $top5Approved = Overtime::select('employee_name', DB::raw('SUM(total_jam) as total_jam'))
+            ->where('status', 'approved')
+            ->groupBy('employee_name')
+            ->orderByDesc('total_jam')
+            ->take(5)
+            ->get();
+
+        // 3. Top 5 Pending
+        $top5Pending = Overtime::select('employee_name', DB::raw('SUM(total_jam) as total_jam'))
+            ->where('status', 'pending')
+            ->groupBy('employee_name')
+            ->orderByDesc('total_jam')
+            ->take(5)
+            ->get();
+
+        return view('admin.index', compact(
+            'totalUsers', 
+            'totalApproved', 
+            'totalPending', 
+            'chartLabels', 
+            'chartData', 
+            'top5All', 
+            'top5Approved', 
+            'top5Pending'
+        ));
     }
 
     public function overtimes()
@@ -68,5 +93,20 @@ class AdminController extends Controller
         $overtime = Overtime::findOrFail($id);
         $overtime->delete();
         return redirect()->back()->with('success', 'Pengajuan lembur berhasil dihapus.');
+    }
+
+    public function bulkDownload(Request $request)
+    {
+        $overtimes = Overtime::whereIn('id', $request->ids ?? [])
+            ->where('status', 'approved')
+            ->latest()
+            ->get();
+
+        if ($overtimes->isEmpty()) {
+            return back()->with('error', 'Tidak ada data lembur yang disetujui untuk diunduh.');
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.bulk-overtime', compact('overtimes'));
+        return $pdf->download('rekap_lembur_admin_' . date('Ymd_His') . '.pdf');
     }
 }

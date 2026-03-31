@@ -12,25 +12,24 @@ class PimpinanController extends Controller
     {
         $userBagian = auth()->user()->bagian;
 
-        // Calculate totals for employees in the same bagian
-        $totalApproved = Overtime::where('bagian', $userBagian)->where('status', 'approved')->sum('total_jam');
-        $totalWaiting = Overtime::where('bagian', $userBagian)->whereIn('status', ['waiting', 'pending'])->sum('total_jam');
-        $totalRejected = Overtime::where('bagian', $userBagian)->where('status', 'rejected')->sum('total_jam');
+        // Calculate totals for employees in the same bagian (Rounded)
+        $totalApproved = round(Overtime::where('bagian', $userBagian)->where('status', 'approved')->sum('total_jam'));
+        $totalWaiting = round(Overtime::where('bagian', $userBagian)->whereIn('status', ['waiting', 'pending'])->sum('total_jam'));
+        $totalRejected = round(Overtime::where('bagian', $userBagian)->where('status', 'rejected')->sum('total_jam'));
 
-        // Chart: User with highest count of approved overtimes IN THE SAME BAGIAN
-        $chartData = Overtime::select('user_id', DB::raw('count(*) as total'))
+        // Top 10 Karyawan Lembuur (Based on SUM of total_jam)
+        $top10 = Overtime::select('employee_name', DB::raw('SUM(total_jam) as total_jam'))
             ->where('bagian', $userBagian)
             ->where('status', 'approved')
-            ->groupBy('user_id')
-            ->orderByDesc('total')
+            ->groupBy('employee_name')
+            ->orderByDesc('total_jam')
             ->take(10)
-            ->with('user:id,name')
             ->get();
             
-        $labels = $chartData->map(fn($o) => $o->user->name ?? 'Unknown')->toArray();
-        $data = $chartData->map(fn($o) => $o->total)->toArray();
+        $labels = $top10->map(fn($o) => $o->employee_name)->toArray();
+        $data = $top10->map(fn($o) => round($o->total_jam))->toArray();
 
-        return view('pimpinan.dashboard', compact('labels', 'data', 'totalApproved', 'totalWaiting', 'totalRejected'));
+        return view('pimpinan.dashboard', compact('labels', 'data', 'totalApproved', 'totalWaiting', 'totalRejected', 'top10'));
     }
 
     public function approvals()

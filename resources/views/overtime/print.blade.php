@@ -4,126 +4,265 @@
     <meta charset="UTF-8">
     <title>Surat Tugas Lembur - {{ $overtime->employee_name }}</title>
     <style>
-        body { margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #000; }
-        .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 40px; box-sizing: border-box; }
+        /* PDF Page Setup */
+        @page { 
+            margin: 0; 
+        }
         
-        .header { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #1e293b; padding-bottom: 20px; }
-        .logo-img { width: 60px; height: 60px; margin-right: 20px; }
-        .logo-img img { width: 60px; height: 60px; object-fit: contain; }
-        .logo-text { display: flex; flex-direction: column; justify-content: center; }
-        .logo-title { font-size: 28px; font-weight: 800; color: #0f172a; letter-spacing: -1px; text-transform: uppercase; font-family: 'Helvetica', sans-serif; }
-        .logo-subtitle { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-top: -5px; }
+        body { 
+            padding: 1.5cm 1.5cm 1.5cm 1.5cm; /* Top 1.5cm to allow logo move up, Sides 1.5cm */
+            font-family: 'Helvetica', 'Arial', sans-serif; 
+            font-size: 13px; 
+            color: #000; 
+            line-height: 1.5; 
+        }
         
-        .title { text-align: center; font-weight: 800; font-size: 20px; margin-bottom: 35px; color: #0f172a; border: 2px solid #0f172a; padding: 10px; display: inline-block; width: 100%; box-sizing: border-box; }
-        .section { margin-bottom: 24px; line-height: 1.5; }
-        .row { display: flex; margin-bottom: 8px; }
-        .label { width: 180px; }
-        .colon { width: 20px; }
-        .value { flex: 1; }
+        .header { 
+            width: 100%; 
+            margin-left: -1.2cm; /* Logo mentok kiri */
+            margin-top: -0.8cm; /* Logo mentok atas */
+            margin-bottom: 15px; /* Reduced gap */
+        }
         
-        .border-bottom-line { border-bottom: 1px solid #000; padding-bottom: 5px; margin-top: 5px; min-height: 20px; }
+        .logo-img { 
+            width: 250px; 
+            height: auto; 
+        }
         
-        .footer-note { font-weight: bold; margin-top: 40px; font-size: 12px; line-height: 1.6; }
-        .footer-note span { font-weight: normal; font-style: italic; }
+        .title { 
+            text-align: center; 
+            font-weight: bold; 
+            font-size: 18px; 
+            text-decoration: underline; 
+            margin-top: 10px; /* Moved up */
+            margin-bottom: 25px; /* Slightly reduced */
+            text-transform: uppercase;
+        }
         
-        .statement { font-style: italic; font-weight: bold; margin-top: 15px; text-align: justify; }
-        
-        .signatures { display: flex; justify-content: space-between; margin-top: 50px; text-align: center; }
-        .sign-box { width: 280px; }
-        .sign-title { min-height: 40px; font-weight: normal; }
-        .sign-space { height: 90px; }
-        
-        @media print {
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .container { padding: 0; }
+        .section-intro {
+            margin-bottom: 5px; /* Reduced gap */
+        }
+
+        /* Identity Table for Perfect Colon Alignment */
+        .identity-table {
+            width: 100%;
+            margin-bottom: 15px; /* Reduced gap */
+            border-collapse: collapse;
+        }
+        .identity-table td {
+            padding: 1px 0; /* Reduced padding */
+            vertical-align: top;
+        }
+        .label-col {
+            width: 160px;
+        }
+        .colon-col {
+            width: 20px;
+            text-align: center;
+        }
+        .value-col {
+            font-weight: bold;
+        }
+
+        .task-section {
+            margin-top: 15px; /* Moved up */
+        }
+        .task-content {
+            padding-bottom: 3px;
+            min-height: 50px; 
+            font-weight: bold;
+            margin-bottom: 25px; /* Slightly reduced */
+        }
+        /* Specific underline for the task text only */
+        .underline-text {
+            border-bottom: 1.5px solid #000;
+            padding-bottom: 1px;
+            display: inline-block;
+        }
+
+        .footer-note {
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 15px;
+        }
+        .footer-note span {
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        .statement-box {
+            margin-top: 15px; /* Moved up */
+            margin-bottom: 30px; /* Jarak sebelum tanda tangan */
+        }
+        .statement-title {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        .statement-body {
+            font-style: italic;
+            font-size: 12px;
+            text-align: justify;
+        }
+
+        /* Footer / Signatures Table (Symmetric) */
+        .signature-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .sign-cell {
+            width: 50%;
+            text-align: center;
+            vertical-align: top;
+        }
+        .sign-title {
+            font-weight: normal;
+            margin-bottom: 5px;
+            min-height: 40px; /* Space for Jakarta row and Title */
+        }
+        .sign-space {
+            height: 90px; 
+            position: relative;
+        }
+        .sign-img {
+            max-height: 85px;
+            max-width: 180px;
+            display: block;
+            margin: 0 auto;
+        }
+        .name-row {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .nik-row {
+            font-size: 12px;
+            margin-top: 2px;
+        }
+        .underline {
+            text-decoration: underline;
         }
     </style>
 </head>
-<body onload="window.print()">
-    <div class="container">
-        <!-- Logo Header -->
-        <div class="header">
-            <div class="logo-img">
-                @php
-                    $logoPath = public_path('images/logo-gas-lembur.png');
-                    $logoData = base64_encode(file_get_contents($logoPath));
-                    $logoSrc = 'data:image/png;base64,' . $logoData;
-                @endphp
-                <img src="{{ $logoSrc }}" alt="Logo">
-            </div>
-            <div class="logo-text">
-                <div class="logo-title">GAS-LEMBUR</div>
-                <div class="logo-subtitle">Sistem Informasi Lembur Karyawan</div>
-            </div>
-        </div>
+<body>
+    <div class="header">
+        @php
+            \Carbon\Carbon::setLocale('id');
+            $logoPath = public_path('images/logo-lmd.png');
+            if(!file_exists($logoPath)) {
+                $logoPath = public_path('images/logo-gas-lembur.png');
+            }
+            $logoData = base64_encode(file_get_contents($logoPath));
+            $logoSrc = 'data:image/png;base64,' . $logoData;
+        @endphp
+        <img src="{{ $logoSrc }}" class="logo-img" alt="Logo LMD">
+    </div>
 
-        <div class="title">SURAT TUGAS LEMBUR</div>
+    <div class="title">SURAT TUGAS LEMBUR</div>
 
-        <div class="section">
-            <p>Di instruksikan kepada :</p>
-            <div class="row"><div class="label">Nama</div><div class="colon">:</div><div class="value">{{ $overtime->employee_name }}</div></div>
-            <div class="row"><div class="label">NIK</div><div class="colon">:</div><div class="value">{{ $overtime->employee_no }}</div></div>
-            <div class="row"><div class="label">Bagian/Divisi</div><div class="colon">:</div><div class="value">{{ $overtime->bagian }} / {{ $overtime->divisi }}</div></div>
-            <div class="row"><div class="label">Lokasi Kerja</div><div class="colon">:</div><div class="value">{{ $overtime->lokasi_kerja }}</div></div>
-        </div>
+    <div class="section-intro">Di instruksikan kepada :</div>
+    
+    <table class="identity-table">
+        <tr>
+            <td class="label-col">Nama</td>
+            <td class="colon-col">:</td>
+            <td class="value-col">{{ $overtime->employee_name }}</td>
+        </tr>
+        <tr>
+            <td class="label-col">NIK</td>
+            <td class="colon-col">:</td>
+            <td class="value-col">{{ $overtime->employee_no }}</td>
+        </tr>
+        <tr>
+            <td class="label-col">Bagian/Divisi</td>
+            <td class="colon-col">:</td>
+            <td class="value-col">{{ $overtime->bagian }} / {{ $overtime->divisi }}</td>
+        </tr>
+        <tr>
+            <td class="label-col">Lokasi Kerja</td>
+            <td class="colon-col">:</td>
+            <td class="value-col">{{ $overtime->lokasi_kerja }}</td>
+        </tr>
+    </table>
 
-        <div class="section" style="margin-top:20px;">
-            <p>Untuk melaksanakan lembur pada :</p>
-            <div class="row"><div class="label">Hari/ Tanggal</div><div class="colon">:</div><div class="value">{{ \Carbon\Carbon::parse($overtime->jam_masuk ?: $overtime->created_at)->translatedFormat('l, d F Y') }}</div></div>
-            <div class="row"><div class="label">Durasi Jam Lembur</div><div class="colon">:</div><div class="value">{{ $overtime->total_jam }} Jam</div></div>
-        </div>
+    <div class="section-intro">Untuk melaksanakan lembur pada :</div>
+    
+    <table class="identity-table">
+        <tr>
+            <td class="label-col">Hari/ Tanggal</td>
+            <td class="colon-col">:</td>
+            <td class="value-col">
+                {{ \Carbon\Carbon::parse($overtime->tanggal_masuk)->translatedFormat('l, d F Y') }}
+                @if($overtime->tanggal_masuk !== $overtime->tanggal_keluar)
+                    s/d {{ \Carbon\Carbon::parse($overtime->tanggal_keluar)->translatedFormat('l, d F Y') }}
+                @endif
+            </td>
+        </tr>
+        <tr>
+            <td class="label-col">Durasi Jam Lembur</td>
+            <td class="colon-col">:</td>
+            <td class="value-col">{{ (int)$overtime->total_jam }} Jam</td>
+        </tr>
+    </table>
 
-        <div class="section" style="margin-top:20px;">
-            <p>Pelaksanaan Lembur tersebut di perlukan untuk menyelesaikan tugas sebagai berikut :</p>
-            <div class="border-bottom-line">{{ $overtime->nama_lemburan }}</div>
-        </div>
-
-        <div class="footer-note">
-            <div>Media approval: Email / WhatsApp (Screenshot percakapan/email approval terlampir) <span>*coret yang tidak perlu</span></div>
-            <div>Lampiran : realisasi KJK/ Pengajuan Overtime Talenta/Lampiran Bukti Approval <span>*coret yang tidak perlu</span></div>
-        </div>
-
-        <div class="section">
-            <p><strong>Pernyataan:</strong></p>
-            <p class="statement">Dengan ini saya yang bertanda tangan sebagai yang di beri tugas, menyatakan bahwa dokumen dan bukti yang dilampirkan adalah benar dan sesuai dengan pelaksanaan lembur yang dilakukan.</p>
-        </div>
-
-        <div class="signatures">
-            <div class="sign-box">
-                <div class="sign-title">Mengetahui atasan langsung</div>
-                <div class="sign-space">
-                    @if($pimpinan && $pimpinan->tanda_tangan)
-                        @php
-                            $pathP = str_starts_with($pimpinan->tanda_tangan, 'data:image') 
-                                ? $pimpinan->tanda_tangan 
-                                : public_path('storage/' . $pimpinan->tanda_tangan);
-                        @endphp
-                        @if(file_exists(public_path('storage/' . $pimpinan->tanda_tangan)) || str_starts_with($pimpinan->tanda_tangan, 'data:image'))
-                            <img src="{{ $pathP }}" style="max-height: 80px; width: auto; margin-top: 5px;">
-                        @endif
-                    @endif
-                </div>
-                <div>(( {{ $pimpinan ? $pimpinan->name : str_repeat('&nbsp;', 25) }} ))</div>
-                <div>NIK : {{ $pimpinan ? $pimpinan->nik : '___________________' }}</div>
-            </div>
-            <div class="sign-box">
-                <div class="sign-title">Jakarta, {{ \Carbon\Carbon::parse($overtime->jam_masuk ?: $overtime->created_at)->translatedFormat('d F Y') }}<br>Yang menyatakan dan di beri tugas</div>
-                <div class="sign-space">
-                    @if($overtime->tanda_tangan)
-                        @php
-                            $pathO = str_starts_with($overtime->tanda_tangan, 'data:image') 
-                                ? $overtime->tanda_tangan 
-                                : public_path('storage/' . $overtime->tanda_tangan);
-                        @endphp
-                        @if(file_exists(public_path('storage/' . $overtime->tanda_tangan)) || str_starts_with($overtime->tanda_tangan, 'data:image'))
-                            <img src="{{ $pathO }}" style="max-height: 80px; width: auto; margin-top: 5px;">
-                        @endif
-                    @endif
-                </div>
-                <div>(( {{ $overtime->employee_name }} ))</div>
-                <div>NIK : {{ $overtime->employee_no }}</div>
-            </div>
+    <div class="task-section">
+        <div class="section-intro">Pelaksanaan Lembur tersebut di perlukan untuk menyelesaikan tugas sebagai berikut :</div>
+        <div class="task-content">
+            <span class="underline-text">{{ $overtime->nama_lemburan }}</span>
         </div>
     </div>
+
+    <div class="footer-note">
+        Media persetujuan: Email / WhatsApp (Screenshot percakapan/email persetujuan terlampir) <span>*coret yang tidak perlu</span><br>
+        Lampiran : Realisasi KJK/ Pengajuan Lembur Talenta/Lampiran Bukti Persetujuan <span>*coret yang tidak perlu</span>
+    </div>
+
+    <div class="statement-box">
+        <div class="statement-title">Pernyataan:</div>
+        <div class="statement-body">
+            Dengan ini saya yang bertanda tangan sebagai yang di beri tugas, menyatakan bahwa dokumen dan bukti yang dilampirkan adalah benar dan sesuai dengan pelaksanaan lembur yang dilakukan.
+        </div>
+    </div>
+
+    @php
+        $resolvePath = function($path) {
+            if (!$path) return null;
+            // Jika path dimulai dengan /uploads, ambil dari public directory
+            if (str_starts_with($path, '/uploads')) {
+                $fullPath = public_path($path);
+            } else {
+                // Default ke storage directory untuk signatures baru
+                $fullPath = public_path('storage/' . $path);
+            }
+            return file_exists($fullPath) ? $fullPath : null;
+        };
+
+        $pimpinanPath = $resolvePath($pimpinan->tanda_tangan ?? null);
+        $userPath = $resolvePath($overtime->tanda_tangan ?? null);
+    @endphp
+
+    <table class="signature-table">
+        <tr>
+            <td class="sign-cell">
+                <div class="sign-title"><br>Mengetahui atasan langsung</div>
+                <div class="sign-space">
+                    @if($overtime->status === 'approved' && $pimpinanPath)
+                        <img src="{{ $pimpinanPath }}" class="sign-img">
+                    @endif
+                </div>
+                <div class="name-row">(( <span class="underline">{{ $pimpinan ? $pimpinan->name : str_repeat('&nbsp;', 25) }}</span> ))</div>
+                <div class="nik-row">NIK : {{ $pimpinan ? $pimpinan->nik : '___________________' }}</div>
+            </td>
+            <td class="sign-cell">
+                <div class="sign-title">Jakarta, {{ \Carbon\Carbon::parse($overtime->created_at)->translatedFormat('d F Y') }}<br>Yang menyatakan dan di beri tugas</div>
+                <div class="sign-space">
+                    @if($userPath)
+                        <img src="{{ $userPath }}" class="sign-img">
+                    @endif
+                </div>
+                <div class="name-row">(( <span class="underline">{{ $overtime->employee_name }}</span> ))</div>
+                <div class="nik-row">NIK : {{ $overtime->employee_no }}</div>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

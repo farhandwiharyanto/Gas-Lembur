@@ -10,6 +10,9 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
+    // Dashboard User
+    Route::get('/dashboard', [\App\Http\Controllers\UserHistoryController::class, 'dashboard'])->name('user.dashboard');
+
     // Rute user (form lembur)
     Route::get('/', [OvertimeController::class, 'create'])->name('overtime.create');
     Route::post('/submit', [OvertimeController::class, 'store'])->name('overtime.store');
@@ -21,6 +24,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [\App\Http\Controllers\UserProfileController::class, 'edit'])->name('user.profile.edit');
     Route::put('/profile', [\App\Http\Controllers\UserProfileController::class, 'update'])->name('user.profile.update');
     Route::get('/history', [\App\Http\Controllers\UserHistoryController::class, 'index'])->name('user.history.index');
+    Route::post('/history/bulk-download', [\App\Http\Controllers\UserHistoryController::class, 'bulkDownload'])->name('user.bulk_download');
     
     // Rute Pimpinan
     Route::group(['prefix' => 'pimpinan'], function () {
@@ -31,13 +35,13 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/reject/{id}', [\App\Http\Controllers\PimpinanController::class, 'reject'])->name('pimpinan.reject');
     });
 
-    // Rute admin (dashboard & approval) menggunakan penanganan sederhana di Controller atau callback 
-    // Untuk keamanan lebih baik idealnya pakai Middleware terpisah, tapi kita gunakan penanganan dasar dulu:
+    // Rute admin (dashboard & approval) 
     Route::group(['prefix' => 'admin'], function () {
         Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
         
         // Manajemen Lembur
         Route::get('/overtimes', [AdminController::class, 'overtimes'])->name('admin.overtimes.index');
+        Route::post('/overtimes/bulk-download', [AdminController::class, 'bulkDownload'])->name('admin.bulk_download');
         Route::patch('/approve/{id}', [AdminController::class, 'approve'])->name('admin.approve');
         Route::patch('/force-approve/{id}', [AdminController::class, 'forceApprove'])->name('admin.force_approve');
         Route::patch('/reject/{id}', [AdminController::class, 'reject'])->name('admin.reject');
