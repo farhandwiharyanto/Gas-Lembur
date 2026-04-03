@@ -734,3 +734,32 @@ SESI I: DATA CLEANUP & E2E TESTING (FASE 20)
 ================================================================================
 DOKUMEN INI TERAKHIR DIPERBARUI PADA: 01 APRIL 2026 (FINAL DEPLOYMENT READY)
 ================================================================================
+
+--------------------------------------------------------------------------------
+SESI J: FINALISASI FORMAT DOKUMEN & KALKULASI DESIMAL (FASE 21)
+--------------------------------------------------------------------------------
+**Prompt User:**
+1. "revisi sedikit lagi... dibawah 'Pelaksanaan Lembur...' diisi oleh Nama Lemburan+Nomor Tiket (Standby On Call IT IED (#701538)"
+2. "Jakarta, [Tanggal] diisi sesuai dengan Tanggal pelaksanaannya..."
+3. "supaya rapih, untuk di halaman user dibuatkan filter per bulan... Tgl. Pengajuan dibuatkan sesuai tanggal_masuk ASC"
+4. "tadi saya edit filenya kok jadi 0 jamnya engga berubah... sepertinya kalau ada .30 menit dibuatkan jadi 13 jam 30 menit"
+
+**Workflow & Hasil:**
+- **Revisi Format Dokumen PDF**: 
+  * Me-replace _underline_ kalimat menjadi garis bawah penuh (_border-bottom_) pada tabel.
+  * Mengembalikan ketebalan teks (bold) pada keterangan rincian tugas.
+  * Memodifikasi layout tanda tangan (`(( TERTANDA ))`) menjadi format teks UPPERCASE secara otomatis menggunakan Blade templating.
+  * Menerapkan teks coretan stempel otomatis (_strikethrough_ & `<del>`) pada opsi "WhatsApp" dan "realisasi KJK" di bagian bawah cetakan PDF.
+  * Merubah penamaan file hasil _download PDF_ menyesuaikan pedoman perusahaan dengan ekstensi standar dinamis.
+- **Kalkulasi Jam Lembur**:
+  * Menghapus pembulatan otomatis `round()` PHP dan `Math.round()` pada JS sehingga dapat merekam nilai jam desimal dengan presisi (contoh: 13.5 jam murni).
+  * Memperbaiki _Bug Date Offset_ (_Invalid Date_) di formulir (_front-end_) pada saat mode Edit yang sebelumnya menargetkan ekstensi kompilasi HH:MM:SS menjadi HH:MM murni, menghindari hasil lembur ter-reset ke angka '0 Jam'.
+  * Sistem render domPDF diatur dapat menerjemahkan nilai desimal secara utuh menjadi sisa menit gantung dengan fungsi `str_pad` & `fmod` (ex: 13.50 dirender menjadi 13 jam 30 menit).
+- **Filter Dashboard**: 
+  * Mengembangkan filter bulan dinamis di portal User, mem-filter otomatis baris tabel riwayat dan rekapitulasi hitungan data Total Jam bersumber langsung dari input dropdown bulan-tahun.
+  * Mengembalikan urutan kronologis "Tgl Pengajuan" agar ditarik berdasar `tanggal_masuk` (*Ascending*) tanpa menumpas _validity request_ asli waktu buat.
+  * Membuka akses saklar centang _Bulk Download_ dan Cetak PDF Satuan mandiri kepada semua ajuan yang masih berstatus **"Menunggu"** menyesuaikan prosedur awal.
+
+================================================================================
+DOKUMEN INI TERAKHIR DIPERBARUI PADA: 03 APRIL 2026 (FINAL REFINEMENTS)
+================================================================================
