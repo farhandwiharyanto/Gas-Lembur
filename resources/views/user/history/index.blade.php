@@ -28,6 +28,8 @@
                 <p class="text-xs text-slate-400 mt-1 font-semibold uppercase tracking-wider">Pilih beberapa data untuk diunduh menjadi satu file PDF.</p>
             </div>
             <div class="flex items-center space-x-3">
+                <input type="month" id="monthFilter" value="{{ $selectedMonth ?? '' }}" onchange="window.location.href='?month=' + this.value" class="px-3 py-2 text-xs rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500 text-slate-600 font-medium bg-white">
+                
                 <button type="submit" id="bulkBtn" disabled class="px-5 py-2.5 bg-slate-800 hover:bg-black text-white text-[11px] font-extrabold rounded-xl transition-all shadow-md active:scale-95 uppercase tracking-widest disabled:opacity-30 disabled:cursor-not-allowed">
                     Bulk Download (PDF)
                 </button>
@@ -54,14 +56,14 @@
                     @forelse($overtimes as $overtime)
                         <tr class="hover:bg-slate-50/50 transition-colors">
                             <td class="px-6 py-4 text-center">
-                                @if($overtime->status == 'approved')
+                                @if(in_array($overtime->status, ['approved', 'waiting', 'pending']))
                                     <input type="checkbox" name="ids[]" value="{{ $overtime->id }}" class="row-checkbox w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                                 @else
                                     <span class="w-4 h-4 inline-block opacity-20">-</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-slate-700 font-bold">
-                                {{ $overtime->created_at->format('d M Y') }}<br>
+                                {{ \Carbon\Carbon::parse($overtime->tanggal_masuk)->format('d M Y') }}<br>
                                 <span class="text-[10px] text-slate-400 font-medium">{{ $overtime->created_at->format('H:i') }} WIB</span>
                             </td>
                             <td class="px-6 py-4">

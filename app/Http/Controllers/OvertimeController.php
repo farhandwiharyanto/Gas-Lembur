@@ -54,7 +54,7 @@ class OvertimeController extends Controller
             'tanggal_keluar' => $validated['tanggal_keluar'],
             'jam_masuk' => $validated['jam_masuk'],
             'jam_keluar' => $validated['jam_keluar'],
-            'total_jam' => round($validated['total_jam']),
+            'total_jam' => $validated['total_jam'],
             'nomor_tiket' => $validated['nomor_tiket'],
             'pemberi_lembur' => $validated['pemberi_lembur'],
             'tanda_tangan' => $fileName,
@@ -112,7 +112,7 @@ class OvertimeController extends Controller
             'tanggal_keluar' => $validated['tanggal_keluar'],
             'jam_masuk' => $validated['jam_masuk'],
             'jam_keluar' => $validated['jam_keluar'],
-            'total_jam' => round($validated['total_jam']),
+            'total_jam' => $validated['total_jam'],
             'nomor_tiket' => $validated['nomor_tiket'],
             'pemberi_lembur' => $validated['pemberi_lembur'],
             'tanda_tangan' => $fileName,
@@ -133,6 +133,9 @@ class OvertimeController extends Controller
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('overtime.print', compact('overtime', 'pimpinan'));
         $pdf->setPaper('A4', 'portrait');
         
-        return $pdf->download('Surat_Tugas_Lembur_' . $overtime->employee_name . '_' . \Carbon\Carbon::parse($overtime->jam_masuk)->format('Ymd') . '.pdf');
+        $bulanTahun = \Carbon\Carbon::parse($overtime->tanggal_masuk)->translatedFormat('F Y');
+        $fileName = "{$overtime->employee_name}_{$overtime->divisi}_MTH_Lemburan {$bulanTahun}.pdf";
+
+        return $pdf->download($fileName);
     }
 }

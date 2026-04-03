@@ -27,8 +27,8 @@
         
         .header { 
             width: 100%; 
-            margin-left: -1.2cm; /* Logo mentok kiri */
-            margin-top: -0.8cm; /* Logo mentok atas */
+            margin-left: -1.5cm;
+            margin-top: -1.5cm;
             margin-bottom: 15px; 
         }
         
@@ -77,29 +77,17 @@
         }
         .task-content {
             padding-bottom: 3px;
-            min-height: 50px; 
-            font-weight: bold;
-            margin-bottom: 25px;
-        }
-        /* Specific underline for the task text only */
-        .underline-text {
+            margin-bottom: 10px;
             border-bottom: 1.5px solid #000;
-            padding-bottom: 1px;
-            display: inline-block;
         }
 
         .footer-note {
-            font-weight: bold;
-            font-size: 11px;
-            margin-bottom: 15px;
-        }
-        .footer-note span {
-            font-weight: normal;
-            font-style: italic;
+            font-size: 13px;
+            margin-bottom: 5px;
         }
 
         .statement-box {
-            margin-top: 15px;
+            margin-top: 5px;
             margin-bottom: 30px; 
         }
         .statement-title {
@@ -108,8 +96,7 @@
         }
         .statement-body {
             font-style: italic;
-            font-weight: bold;
-            font-size: 11.5px;
+            font-size: 13px;
             line-height: 1.5;
             text-align: justify;
         }
@@ -211,27 +198,27 @@
                     <td class="value-col">
                         {{ \Carbon\Carbon::parse($overtime->tanggal_masuk)->translatedFormat('l, d F Y') }}
                         @if($overtime->tanggal_masuk !== $overtime->tanggal_keluar)
-                            s/d {{ \Carbon\Carbon::parse($overtime->tanggal_keluar)->translatedFormat('l, d F Y') }}
+                            - {{ \Carbon\Carbon::parse($overtime->tanggal_keluar)->translatedFormat('l, d F Y') }}
                         @endif
                     </td>
                 </tr>
                 <tr>
                     <td class="label-col">Durasi Jam Lembur</td>
                     <td class="colon-col">:</td>
-                    <td class="value-col">{{ (int)$overtime->total_jam }} Jam</td>
+                    <td class="value-col">{{ (int)$overtime->total_jam }} jam {{ str_pad(round(fmod((float)$overtime->total_jam, 1) * 60), 2, '0', STR_PAD_LEFT) }} menit ({{ \Carbon\Carbon::parse($overtime->jam_masuk)->format('H:i') }} s.d {{ \Carbon\Carbon::parse($overtime->jam_keluar)->format('H:i') }})</td>
                 </tr>
             </table>
 
             <div class="task-section">
                 <div class="section-intro">Pelaksanaan Lembur tersebut di perlukan untuk menyelesaikan tugas sebagai berikut :</div>
                 <div class="task-content">
-                    <span class="underline-text">{{ $overtime->nama_lemburan }}</span>
+                    <strong>{{ $overtime->nama_lemburan }}{{ $overtime->nomor_tiket ? ' (#' . ltrim($overtime->nomor_tiket, '#') . ')' : '' }}</strong>
                 </div>
             </div>
 
             <div class="footer-note">
-                Media persetujuan: Email / WhatsApp (Screenshot percakapan/email persetujuan terlampir) <span>*coret yang tidak perlu</span><br>
-                Lampiran : Realisasi KJK/ Pengajuan Lembur Talenta/Lampiran Bukti Persetujuan <span>*coret yang tidak perlu</span>
+                <strong>Media approval:</strong> Email / <s>WhatsApp (Screenshot percakapan/email approval terlampir) *coret yang tidak perlu</s><br>
+                <strong>Lampiran :</strong> <s>realisasi KJK/ Pengajuan Overtime Talenta/</s>Lampiran Bukti Approval <s>*coret yang tidak perlu</s>
             </div>
 
             <div class="statement-box">
@@ -265,18 +252,18 @@
                                 <img src="{{ $pimpinanPath }}" class="sign-img">
                             @endif
                         </div>
-                        <div class="name-row">(( <span class="underline">{{ $pimpinan ? $pimpinan->name : str_repeat('&nbsp;', 25) }}</span> ))</div>
-                        <div class="nik-row">NIK : {{ $pimpinan ? $pimpinan->nik : '___________________' }}</div>
+                        <div class="name-row">(( <span class="underline">{{ strtoupper($pimpinan ? $pimpinan->name : str_repeat('&nbsp;', 25)) }}</span> ))</div>
+                        <div class="nik-row">NIK: {{ $pimpinan ? $pimpinan->nik : '___________________' }}</div>
                     </td>
                     <td class="sign-cell">
-                        <div class="sign-title">Jakarta, {{ \Carbon\Carbon::parse($overtime->created_at)->translatedFormat('d F Y') }}<br>Yang menyatakan dan di beri tugas</div>
+                        <div class="sign-title">Jakarta, {{ \Carbon\Carbon::parse($overtime->tanggal_masuk)->translatedFormat('d F Y') }}<br>Yang menyatakan dan di beri tugas</div>
                         <div class="sign-space">
                             @if($userPath)
                                 <img src="{{ $userPath }}" class="sign-img">
                             @endif
                         </div>
-                        <div class="name-row">(( <span class="underline">{{ $overtime->employee_name }}</span> ))</div>
-                        <div class="nik-row">NIK : {{ $overtime->employee_no }}</div>
+                        <div class="name-row">(( <span class="underline">{{ strtoupper($overtime->employee_name) }}</span> ))</div>
+                        <div class="nik-row">NIK: {{ $overtime->employee_no }}</div>
                     </td>
                 </tr>
             </table>

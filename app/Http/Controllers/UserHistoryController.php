@@ -30,17 +30,29 @@ class UserHistoryController extends Controller
         return view('user.dashboard', compact('totalApproved', 'totalWaiting', 'totalRejected', 'labels', 'data'));
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $userId = auth()->id();
-        // Calculate totals (Rounded)
-        $totalApproved = round(Overtime::where('user_id', $userId)->where('status', 'approved')->sum('total_jam'));
-        $totalWaiting = round(Overtime::where('user_id', $userId)->whereIn('status', ['waiting', 'pending'])->sum('total_jam'));
-        $totalRejected = round(Overtime::where('user_id', $userId)->where('status', 'rejected')->sum('total_jam'));
+        $query = Overtime::where('user_id', $userId);
+
+        if ($request->has('month') && !empty($request->month)) {
+            $parts = explode('-', $request->month);
+            if (count($parts) == 2) {
+                $query->whereYear('tanggal_masuk', $parts[0])
+                      ->whereMonth('tanggal_masuk', $parts[1]);
+            }
+        }
+
+        // Calculate totals (Rounded) based on filtered state
+        $totalApproved = round((clone $query)->where('status', 'approved')->sum('total_jam'));
+        $totalWaiting = round((clone $query)->whereIn('status', ['waiting', 'pending'])->sum('total_jam'));
+        $totalRejected = round((clone $query)->where('status', 'rejected')->sum('total_jam'));
 
         // Get the overtimes for the currently logged in user
-        $overtimes = Overtime::where('user_id', $userId)->latest()->paginate(10);
-        return view('user.history.index', compact('overtimes', 'totalApproved', 'totalWaiting', 'totalRejected'));
+        $overtimes = $query->orderBy('tanggal_masuk', 'asc')->paginate(10)->withQueryString();
+        $selectedMonth = $request->month ?? '';
+
+        return view('user.history.index', compact('overtimes', 'totalApproved', 'totalWaiting', 'totalRejected', 'selectedMonth'));
     }
 
     public function bulkDownload(Request $request)
@@ -48,8 +60,8 @@ class UserHistoryController extends Controller
         $userId = auth()->id();
         $overtimes = Overtime::where('user_id', $userId)
             ->whereIn('id', $request->ids ?? [])
-            ->where('status', 'approved')
-            ->latest()
+            ->whereIn('status', ['approved', 'waiting', 'pending'])
+            ->orderBy('tanggal_masuk', 'asc')
             ->get();
 
         if ($overtimes->isEmpty()) {
@@ -57,6 +69,11 @@ class UserHistoryController extends Controller
         }
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.bulk-overtime', compact('overtimes'));
-        return $pdf->download('rekap_lembur_gabungan_' . date('Ymd_His') . '.pdf');
+        
+        $firstOvertime = $overtimes->first();
+        $bulanTahun = \Carbon\Carbon::parse($firstOvertime->tanggal_masuk)->translatedFormat('F Y');
+        $fileName = "{$firstOvertime->employee_name}_{$firstOvertime->divisi}_MTH_Lemburan {$bulanTahun}.pdf";
+
+        return $pdf->download($fileName);
     }
 }

@@ -94,12 +94,12 @@
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Jam Masuk</label>
-                    <input type="time" name="jam_masuk" id="jam_masuk" value="{{ old('jam_masuk', $overtime->jam_masuk ?? '') }}" required
+                    <input type="time" name="jam_masuk" id="jam_masuk" value="{{ old('jam_masuk', isset($overtime) ? \Carbon\Carbon::parse($overtime->jam_masuk)->format('H:i') : '') }}" required
                         class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Jam Keluar</label>
-                    <input type="time" name="jam_keluar" id="jam_keluar" value="{{ old('jam_keluar', $overtime->jam_keluar ?? '') }}" required
+                    <input type="time" name="jam_keluar" id="jam_keluar" value="{{ old('jam_keluar', isset($overtime) ? \Carbon\Carbon::parse($overtime->jam_keluar)->format('H:i') : '') }}" required
                         class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
                 </div>
                 <div>
@@ -184,12 +184,14 @@ document.addEventListener('DOMContentLoaded', function() {
  
     function calculateTotal() {
         if (tanggalMasuk.value && jamMasuk.value && tanggalKeluar.value && jamKeluar.value) {
-            let start = new Date(tanggalMasuk.value + 'T' + jamMasuk.value + ':00');
-            let end = new Date(tanggalKeluar.value + 'T' + jamKeluar.value + ':00');
+            let jm = jamMasuk.value.substring(0, 5);
+            let jk = jamKeluar.value.substring(0, 5);
+            let start = new Date(tanggalMasuk.value + 'T' + jm + ':00');
+            let end = new Date(tanggalKeluar.value + 'T' + jk + ':00');
             
             if (end > start) {
                 let diffHours = (end - start) / (1000 * 60 * 60);
-                totalJam.value = Math.round(diffHours);
+                totalJam.value = Number.isInteger(diffHours) ? diffHours : diffHours.toFixed(2);
             } else {
                 totalJam.value = '0';
             }
@@ -209,6 +211,9 @@ document.addEventListener('DOMContentLoaded', function() {
     tanggalKeluar.addEventListener('change', calculateTotal);
     jamMasuk.addEventListener('change', calculateTotal);
     jamKeluar.addEventListener('change', calculateTotal);
+    
+    // Hitung total jam di awal saat halaman diedit
+    calculateTotal();
 });
 </script>
 @endpush
