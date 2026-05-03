@@ -58,14 +58,25 @@ class UserHistoryController extends Controller
     public function bulkDownload(Request $request)
     {
         $userId = auth()->id();
-        $overtimes = Overtime::where('user_id', $userId)
-            ->whereIn('id', $request->ids ?? [])
-            ->whereIn('status', ['approved', 'waiting', 'pending'])
-            ->orderBy('tanggal_masuk', 'asc')
-            ->get();
+        $query = Overtime::where('user_id', $userId)
+            ->whereIn('status', ['approved', 'waiting', 'pending']);
+
+        if ($request->all_selected == '1') {
+            if ($request->has('month') && !empty($request->month)) {
+                $parts = explode('-', $request->month);
+                if (count($parts) == 2) {
+                    $query->whereYear('tanggal_masuk', $parts[0])
+                          ->whereMonth('tanggal_masuk', $parts[1]);
+                }
+            }
+        } else {
+            $query->whereIn('id', $request->ids ?? []);
+        }
+
+        $overtimes = $query->orderBy('tanggal_masuk', 'asc')->get();
 
         if ($overtimes->isEmpty()) {
-            return back()->with('error', 'Tidak ada data lembur yang disetujui untuk diunduh.');
+            return back()->with('error', 'Tidak ada data lembur yang terpilih untuk diunduh.');
         }
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.bulk-overtime', compact('overtimes'));

@@ -22,50 +22,28 @@ class ReportController extends Controller
         $month = $request->query('month');
         $year = $request->query('year');
 
-        $query = Overtime::with('user')->orderBy('created_at', 'desc');
+        $query = Overtime::with('user')->orderBy('tanggal_masuk', 'asc');
 
         if ($month) {
-            $query->whereMonth('created_at', $month);
+            $query->whereMonth('tanggal_masuk', $month);
         }
         if ($year) {
-            $query->whereYear('created_at', $year);
+            $query->whereYear('tanggal_masuk', $year);
         }
 
         $overtimes = $query->get();
 
-        $fileName = 'rekap_lembur_' . ($month ? "bln_{$month}_" : "") . ($year ? "thn_{$year}_" : "") . date('Ymd_His') . '.csv';
+        if ($overtimes->isEmpty()) {
+            return back()->with('error', 'Tidak ada data lembur untuk periode ini.');
+        }
 
-        $headers = [
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        ];
+        $monthName = $month ? \Carbon\Carbon::create()->month($month)->translatedFormat('F') : null;
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.report-recap', compact('overtimes', 'monthName', 'year'));
+        $pdf->setPaper('a4', 'landscape');
 
-        $columns = ['Tanggal', 'Employee Name', 'Employee No', 'Sub Bagian', 'Bagian', 'Divisi', 'Direktorat', 'Total Jam', 'Status'];
+        $fileName = 'rekap_lembur_' . ($month ? "bln_{$month}_" : "") . ($year ? "thn_{$year}_" : "") . date('Ymd_His') . '.pdf';
 
-        $callback = function() use($overtimes, $columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
-
-            foreach ($overtimes as $ot) {
-                fputcsv($file, [
-                    $ot->created_at->format('Y-m-d H:i:s'),
-                    $ot->employee_name,
-                    $ot->employee_no,
-                    $ot->sub_bagian,
-                    $ot->bagian,
-                    $ot->divisi,
-                    $ot->direktorat,
-                    round($ot->total_jam),
-                    $ot->status
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return $pdf->download($fileName);
     }
 }

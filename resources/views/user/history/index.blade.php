@@ -22,6 +22,9 @@
 <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden max-w-6xl mx-auto mb-10">
     <form action="{{ route('user.bulk_download') }}" method="POST" id="bulkDownloadForm">
         @csrf
+        <input type="hidden" name="all_selected" id="allSelectedInput" value="0">
+        <input type="hidden" name="month" value="{{ $selectedMonth }}">
+        
         <div class="px-8 py-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
             <div>
                 <h2 class="text-xl font-extrabold text-slate-800 font-outfit uppercase tracking-tight">Riwayat Pengajuan Lembur</h2>
@@ -37,6 +40,12 @@
                     + Buat Baru
                 </a>
             </div>
+        </div>
+
+        <div id="selectionBanner" class="hidden px-8 py-4 bg-indigo-50/80 border-b border-indigo-100 flex items-center justify-center text-xs transition-all duration-300">
+            <span id="bannerText" class="text-indigo-900 font-bold uppercase tracking-tight"></span>
+            <button type="button" id="selectAllAcross" class="ml-3 px-3 py-1 bg-white border border-indigo-200 text-indigo-600 font-black rounded-lg hover:bg-indigo-600 hover:text-white transition-all uppercase tracking-widest text-[10px]">Pilih semua data ({{ $overtimes->total() }})</button>
+            <button type="button" id="clearSelection" class="hidden ml-3 px-3 py-1 bg-indigo-100 text-indigo-700 font-black rounded-lg hover:bg-indigo-200 transition-all uppercase tracking-widest text-[10px]">Batalkan</button>
         </div>
 
         <div class="overflow-x-auto">
@@ -132,11 +141,40 @@
         const selectAll = document.getElementById('selectAll');
         const checkboxes = document.querySelectorAll('.row-checkbox');
         const bulkBtn = document.getElementById('bulkBtn');
+        const selectionBanner = document.getElementById('selectionBanner');
+        const bannerText = document.getElementById('bannerText');
+        const selectAllAcross = document.getElementById('selectAllAcross');
+        const clearSelection = document.getElementById('clearSelection');
+        const allSelectedInput = document.getElementById('allSelectedInput');
+        
+        const totalRecords = {{ $overtimes->total() }};
+        const currentPageCount = checkboxes.length;
 
         function updateBtnState() {
             const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
-            bulkBtn.disabled = checkedCount === 0;
-            bulkBtn.innerHTML = checkedCount > 0 ? `Bulk Download (${checkedCount}) PDF` : 'Bulk Download (PDF)';
+            
+            if (allSelectedInput.value === '1') {
+                bulkBtn.disabled = false;
+                bulkBtn.innerHTML = `Bulk Download (${totalRecords}) PDF`;
+            } else {
+                bulkBtn.disabled = checkedCount === 0;
+                bulkBtn.innerHTML = checkedCount > 0 ? `Bulk Download (${checkedCount}) PDF` : 'Bulk Download (PDF)';
+            }
+
+            // Banner logic
+            if (selectAll.checked && totalRecords > currentPageCount && allSelectedInput.value === '0') {
+                selectionBanner.classList.remove('hidden');
+                bannerText.innerText = `Semua ${currentPageCount} data di halaman ini terpilih.`;
+                selectAllAcross.classList.remove('hidden');
+                clearSelection.classList.add('hidden');
+            } else if (allSelectedInput.value === '1') {
+                selectionBanner.classList.remove('hidden');
+                bannerText.innerText = `Seluruh ${totalRecords} data telah terpilih.`;
+                selectAllAcross.classList.add('hidden');
+                clearSelection.classList.remove('hidden');
+            } else {
+                selectionBanner.classList.add('hidden');
+            }
         }
 
         if(selectAll) {
@@ -144,6 +182,9 @@
                 checkboxes.forEach(cb => {
                     cb.checked = selectAll.checked;
                 });
+                if (!selectAll.checked) {
+                    allSelectedInput.value = '0';
+                }
                 updateBtnState();
             });
         }
@@ -152,9 +193,28 @@
             cb.addEventListener('change', function() {
                 const allChecked = Array.from(checkboxes).every(c => c.checked);
                 selectAll.checked = allChecked;
+                if (!this.checked) {
+                    allSelectedInput.value = '0';
+                }
                 updateBtnState();
             });
         });
+
+        if(selectAllAcross) {
+            selectAllAcross.addEventListener('click', function() {
+                allSelectedInput.value = '1';
+                updateBtnState();
+            });
+        }
+
+        if(clearSelection) {
+            clearSelection.addEventListener('click', function() {
+                allSelectedInput.value = '0';
+                selectAll.checked = false;
+                checkboxes.forEach(cb => cb.checked = false);
+                updateBtnState();
+            });
+        }
     });
 </script>
 @endpush
