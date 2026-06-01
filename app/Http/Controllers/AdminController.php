@@ -45,6 +45,43 @@ class AdminController extends Controller
             ->take(5)
             ->get();
 
+        // Cuti (Leave) Stats for Admin
+        $totalCutiUsers = \App\Models\Leave::distinct('user_id')->count('user_id');
+        $totalCutiApproved = \App\Models\Leave::where('status', 'approved')->count();
+        $totalCutiPending = \App\Models\Leave::where('status', 'pending')->count();
+
+        // Data for Cuti Bar Chart: Jumlah Hari Cuti per Bagian
+        $chartCutiQuery = \App\Models\Leave::where('status', 'approved')
+            ->select('bagian', DB::raw('SUM(total_hari) as total'))
+            ->groupBy('bagian')
+            ->pluck('total', 'bagian');
+            
+        $chartCutiLabels = $chartCutiQuery->keys()->all();
+        $chartCutiData = $chartCutiQuery->values()->all();
+
+        // 1. Top 5 Karyawan Cuti (Kumulatif)
+        $top5CutiAll = \App\Models\Leave::select('employee_name', DB::raw('SUM(total_hari) as total_hari'))
+            ->groupBy('employee_name')
+            ->orderByDesc('total_hari')
+            ->take(5)
+            ->get();
+
+        // 2. Top 5 Cuti Approved (Hari)
+        $top5CutiApproved = \App\Models\Leave::select('employee_name', DB::raw('SUM(total_hari) as total_hari'))
+            ->where('status', 'approved')
+            ->groupBy('employee_name')
+            ->orderByDesc('total_hari')
+            ->take(5)
+            ->get();
+
+        // 3. Top 5 Cuti Pending (Hari)
+        $top5CutiPending = \App\Models\Leave::select('employee_name', DB::raw('SUM(total_hari) as total_hari'))
+            ->where('status', 'pending')
+            ->groupBy('employee_name')
+            ->orderByDesc('total_hari')
+            ->take(5)
+            ->get();
+
         return view('admin.index', compact(
             'totalUsers', 
             'totalApproved', 
@@ -53,7 +90,15 @@ class AdminController extends Controller
             'chartData', 
             'top5All', 
             'top5Approved', 
-            'top5Pending'
+            'top5Pending',
+            'totalCutiUsers',
+            'totalCutiApproved',
+            'totalCutiPending',
+            'chartCutiLabels',
+            'chartCutiData',
+            'top5CutiAll',
+            'top5CutiApproved',
+            'top5CutiPending'
         ));
     }
 

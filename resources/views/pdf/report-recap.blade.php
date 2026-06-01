@@ -144,9 +144,9 @@
     <div class="footer">
         <div class="signature-box">
             <p>Jakarta, {{ now()->translatedFormat('d F Y') }}</p>
-            <p style="margin-bottom: 60px;">Dicetak oleh Administrator,</p>
+            <div style="margin-bottom: 60px;"></div>
             <p class="font-bold">__________________________</p>
-            <p>Sistem Gas-Lembur</p>
+            <p>System Administrator</p>
         </div>
     </div>
 </body>

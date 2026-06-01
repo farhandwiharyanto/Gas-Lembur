@@ -12,6 +12,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
         .font-outfit { font-family: 'Outfit', sans-serif; }
+        [x-cloak] { display: none !important; }
     </style>
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -33,24 +34,53 @@
             </div>
         </div>
         
-        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            <a href="{{ route('pimpinan.dashboard') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('pimpinan.dashboard') ? 'bg-emerald-600 text-white' : 'hover:bg-emerald-800 hover:text-white' }} rounded-lg transition-colors">
+        <nav class="flex-1 px-4 py-6 space-y-3 overflow-y-auto">
+            <!-- 1. Dashboard -->
+            <a href="{{ route('pimpinan.dashboard') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('pimpinan.dashboard') ? 'bg-emerald-600 text-white font-bold' : 'hover:bg-emerald-800 hover:text-white' }} rounded-lg transition-colors">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
-                Dashboard Chart
+                Dashboard
             </a>
             
-            <a href="{{ route('pimpinan.approvals') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('pimpinan.approvals') ? 'bg-emerald-600 text-white' : 'hover:bg-emerald-800 hover:text-white' }} rounded-lg transition-colors">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Persetujuan Lembur
-            </a>
-            
-            <a href="{{ route('pimpinan.history') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('pimpinan.history') ? 'bg-emerald-600 text-white' : 'hover:bg-emerald-800 hover:text-white' }} rounded-lg transition-colors">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                Riwayat Disetujui
-            </a>
-            
-            
-            <a href="{{ route('user.profile.edit') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('user.profile.*') ? 'bg-emerald-600 text-white' : 'hover:bg-emerald-800 hover:text-white' }} rounded-lg transition-colors">
+            <!-- 2. Lembur Dropdown -->
+            <div x-data="{ open: {{ request()->routeIs('pimpinan.approvals') || request()->routeIs('pimpinan.history') ? 'true' : 'false' }} }" class="space-y-1">
+                <button @click="open = !open" class="w-full flex items-center justify-between px-4 py-3 hover:bg-emerald-800 hover:text-white rounded-lg transition-colors text-slate-100 {{ request()->routeIs('pimpinan.approvals') || request()->routeIs('pimpinan.history') ? 'bg-emerald-900/40 text-emerald-400 font-bold border-l-4 border-emerald-500' : '' }}">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('pimpinan.approvals') || request()->routeIs('pimpinan.history') ? 'text-emerald-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>Lembur</span>
+                    </div>
+                    <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-90': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <div x-show="open" x-cloak class="pl-6 space-y-1 mt-1 transition-all duration-300">
+                    <a href="{{ route('pimpinan.approvals') }}" class="flex items-center px-4 py-2 text-xs {{ request()->routeIs('pimpinan.approvals') ? 'bg-emerald-600 text-white font-bold' : 'text-slate-300 hover:bg-emerald-800' }} rounded-md transition-colors">
+                        Persetujuan Lembur
+                    </a>
+                    <a href="{{ route('pimpinan.history') }}" class="flex items-center px-4 py-2 text-xs {{ request()->routeIs('pimpinan.history') ? 'bg-emerald-600 text-white font-bold' : 'text-slate-300 hover:bg-emerald-800' }} rounded-md transition-colors">
+                        Riwayat Lembur
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3. Cuti Dropdown -->
+            <div x-data="{ open: {{ request()->routeIs('pimpinan.cuti.*') ? 'true' : 'false' }} }" class="space-y-1">
+                <button @click="open = !open" class="w-full flex items-center justify-between px-4 py-3 hover:bg-emerald-800 hover:text-white rounded-lg transition-colors text-slate-100 {{ request()->routeIs('pimpinan.cuti.*') ? 'bg-emerald-900/40 text-emerald-400 font-bold border-l-4 border-emerald-500' : '' }}">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('pimpinan.cuti.*') ? 'text-emerald-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span>Cuti</span>
+                    </div>
+                    <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-90': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <div x-show="open" x-cloak class="pl-6 space-y-1 mt-1 transition-all duration-300">
+                    <a href="{{ route('pimpinan.cuti.approvals') }}" class="flex items-center px-4 py-2 text-xs {{ request()->routeIs('pimpinan.cuti.approvals') ? 'bg-emerald-600 text-white font-bold' : 'text-slate-300 hover:bg-emerald-800' }} rounded-md transition-colors">
+                        Persetujuan Cuti
+                    </a>
+                    <a href="{{ route('pimpinan.cuti.history') }}" class="flex items-center px-4 py-2 text-xs {{ request()->routeIs('pimpinan.cuti.history') ? 'bg-emerald-600 text-white font-bold' : 'text-slate-300 hover:bg-emerald-800' }} rounded-md transition-colors">
+                        Riwayat Cuti
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4. Profil Saya -->
+            <a href="{{ route('user.profile.edit') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('user.profile.*') ? 'bg-emerald-600 text-white font-bold' : 'hover:bg-emerald-800 hover:text-white' }} rounded-lg transition-colors">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 Profil Saya
             </a>
@@ -93,12 +123,149 @@
         </header>
 
         <main class="flex-1 overflow-y-auto bg-gray-50 p-6 flex flex-col items-center">
-            <div class="w-full max-w-6xl">
+            <div class="w-full max-w-[1400px]">
                 @yield('content')
             </div>
         </main>
     </div>
 </div>
+
+<!-- Custom Premium Confirmation Modal -->
+<div x-data="globalConfirmModal()"
+     @open-confirm.window="open($event.detail)"
+     x-show="isOpen"
+     class="fixed inset-0 z-50 overflow-y-auto"
+     style="display: none;"
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0">
+     
+    <!-- Backdrop Blur -->
+    <div class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"></div>
+
+    <!-- Modal Content Positioner -->
+    <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
+        <div x-show="isOpen"
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+             x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+             class="relative transform overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg p-8 relative z-10 text-white">
+             
+            <!-- Decorative Glow background -->
+            <div class="absolute -right-16 -top-16 w-36 h-36 rounded-full blur-3xl opacity-20"
+                 :class="{
+                    'bg-emerald-500': type === 'success' || type === 'approve',
+                    'bg-red-500': type === 'danger' || type === 'reject',
+                    'bg-indigo-500': type === 'info' || type === 'bulk'
+                 }"></div>
+            <div class="absolute -left-16 -bottom-16 w-36 h-36 rounded-full blur-3xl opacity-10"
+                 :class="{
+                    'bg-emerald-500': type === 'success' || type === 'approve',
+                    'bg-red-500': type === 'danger' || type === 'reject',
+                    'bg-indigo-500': type === 'info' || type === 'bulk'
+                 }"></div>
+
+            <div class="relative z-10">
+                <!-- Icon Header -->
+                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl mb-6 shadow-lg border"
+                     :class="{
+                        'bg-emerald-500/10 border-emerald-500/20 text-emerald-400': type === 'success' || type === 'approve',
+                        'bg-red-500/10 border-red-500/20 text-red-400': type === 'danger' || type === 'reject',
+                        'bg-indigo-500/10 border-indigo-500/20 text-indigo-400': type === 'info' || type === 'bulk'
+                     }">
+                     <!-- Approve/Success Icon -->
+                     <template x-if="type === 'success' || type === 'approve'">
+                         <svg class="h-8 w-8 animate-pulse" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                         </svg>
+                     </template>
+                     <!-- Reject/Danger Icon -->
+                     <template x-if="type === 'danger' || type === 'reject'">
+                         <svg class="h-8 w-8 animate-pulse" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                         </svg>
+                     </template>
+                     <!-- Info/Bulk Icon -->
+                     <template x-if="type === 'info' || type === 'bulk'">
+                         <svg class="h-8 w-8 animate-pulse" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                         </svg>
+                     </template>
+                </div>
+
+                <!-- Text content -->
+                <div class="text-center">
+                    <h3 class="text-xl font-black font-outfit uppercase tracking-tight text-white mb-2" x-text="title"></h3>
+                    <p class="text-slate-400 text-sm font-medium leading-relaxed px-2" x-html="message"></p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-8 flex flex-col sm:flex-row gap-3">
+                    <button type="button" 
+                            @click="close()" 
+                            class="w-full px-6 py-3.5 bg-slate-800 hover:bg-slate-700/80 text-slate-300 font-extrabold rounded-2xl transition-all border border-slate-700/50 uppercase tracking-widest text-xs active:scale-95" 
+                            x-text="cancelText"></button>
+                    <button type="button" 
+                            @click="confirm()" 
+                            class="w-full px-6 py-3.5 font-extrabold rounded-2xl transition-all uppercase tracking-widest text-xs active:scale-95 shadow-lg"
+                            :class="{
+                                'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-900/20': type === 'success' || type === 'approve',
+                                'bg-red-600 hover:bg-red-500 text-white shadow-red-900/20': type === 'danger' || type === 'reject',
+                                'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-900/20': type === 'info' || type === 'bulk'
+                            }"
+                            x-text="confirmText"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function globalConfirmModal() {
+        return {
+            isOpen: false,
+            title: '',
+            message: '',
+            confirmText: 'Ya, Lanjutkan',
+            cancelText: 'Batal',
+            type: 'info',
+            onConfirm: null,
+            
+            open(detail) {
+                this.title = detail.title || 'Konfirmasi';
+                this.message = detail.message || 'Apakah Anda yakin?';
+                this.confirmText = detail.confirmText || 'Ya, Lanjutkan';
+                this.cancelText = detail.cancelText || 'Batal';
+                this.type = detail.type || 'info';
+                this.onConfirm = detail.onConfirm || null;
+                this.isOpen = true;
+            },
+            
+            close() {
+                this.isOpen = false;
+            },
+            
+            confirm() {
+                if (typeof this.onConfirm === 'function') {
+                    this.onConfirm();
+                }
+                this.close();
+            }
+        }
+    }
+
+    window.showConfirm = function(options) {
+        window.dispatchEvent(new CustomEvent('open-confirm', {
+            detail: options
+        }));
+    };
+</script>
 
 @stack('scripts')
 </body>

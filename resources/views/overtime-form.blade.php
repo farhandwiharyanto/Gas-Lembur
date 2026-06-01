@@ -27,7 +27,7 @@
         </div>
     @endif
 
-    <form id="overtimeForm" action="{{ isset($overtime) ? route('overtime.update', $overtime->id) : route('overtime.store') }}" method="POST" class="p-8 space-y-8">
+    <form id="overtimeForm" action="{{ isset($overtime) ? route('overtime.update', $overtime->id) : route('overtime.store') }}" method="POST" onsubmit="confirmOvertimeSubmit(event)" class="p-8 space-y-8">
         @csrf
         @if(isset($overtime)) @method('PUT') @endif
         
@@ -215,5 +215,35 @@ document.addEventListener('DOMContentLoaded', function() {
     // Hitung total jam di awal saat halaman diedit
     calculateTotal();
 });
+
+function confirmOvertimeSubmit(event) {
+    if (event.target.dataset.confirmed === 'true') {
+        return;
+    }
+    
+    event.preventDefault();
+    
+    const namaLemburan = document.getElementById('nama_lemburan')?.value || '';
+    const tanggalMasuk = document.getElementById('tanggal_masuk')?.value || '';
+    const totalJam = document.getElementById('total_jam')?.value || '0';
+    
+    showConfirm({
+        title: 'Kirim Pengajuan Lembur',
+        message: `Apakah Anda yakin ingin mengirim pengajuan lembur untuk:<br><br>
+                  <div class="bg-slate-950/40 p-4 rounded-2xl text-left border border-slate-800 text-xs space-y-1.5 font-sans">
+                    <div><span class="text-slate-500 uppercase font-bold tracking-wider">Nama Kegiatan:</span> <span class="text-white font-bold">${namaLemburan}</span></div>
+                    <div><span class="text-slate-500 uppercase font-bold tracking-wider">Tanggal:</span> <span class="text-white font-semibold">${tanggalMasuk}</span></div>
+                    <div><span class="text-slate-500 uppercase font-bold tracking-wider">Total Durasi:</span> <span class="text-emerald-400 font-extrabold">${totalJam} Jam</span></div>
+                  </div>`,
+        confirmText: 'Ya, Kirim',
+        cancelText: 'Periksa Kembali',
+        type: 'info',
+        onConfirm: () => {
+            const form = document.getElementById('overtimeForm');
+            form.dataset.confirmed = 'true';
+            form.submit();
+        }
+    });
+}
 </script>
 @endpush

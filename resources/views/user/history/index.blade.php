@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Dashboard Cards -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 max-w-6xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
     <div class="bg-green-600 rounded-[2rem] shadow-[0_10px_30px_rgba(22,163,74,0.25)] p-8 flex flex-col justify-center items-center text-white transform hover:scale-105 transition-transform duration-300">
         <div class="text-green-100 text-[10px] font-bold mb-2 uppercase tracking-widest opacity-80">Total Jam (Disetujui)</div>
         <div class="text-4xl font-extrabold font-outfit">{{ (int)$totalApproved }} <span class="text-sm font-medium opacity-60">JAM</span></div>
@@ -19,7 +19,7 @@
     </div>
 </div>
 
-<div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden max-w-6xl mx-auto mb-10">
+<div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden mb-10">
     <form action="{{ route('user.bulk_download') }}" method="POST" id="bulkDownloadForm">
         @csrf
         <input type="hidden" name="all_selected" id="allSelectedInput" value="0">

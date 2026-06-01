@@ -25,6 +25,19 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile', [\App\Http\Controllers\UserProfileController::class, 'update'])->name('user.profile.update');
     Route::get('/history', [\App\Http\Controllers\UserHistoryController::class, 'index'])->name('user.history.index');
     Route::post('/history/bulk-download', [\App\Http\Controllers\UserHistoryController::class, 'bulkDownload'])->name('user.bulk_download');
+    Route::get('/perhitungan-lembur', [\App\Http\Controllers\PerhitunganLemburController::class, 'index'])->name('user.perhitungan.index');
+    
+    // Rute Cuti Karyawan
+    Route::group(['prefix' => 'cuti'], function () {
+        Route::get('/dashboard', [\App\Http\Controllers\LeaveController::class, 'dashboard'])->name('user.cuti.dashboard');
+        Route::get('/', [\App\Http\Controllers\LeaveController::class, 'index'])->name('user.cuti.index');
+        Route::get('/create', [\App\Http\Controllers\LeaveController::class, 'create'])->name('user.cuti.create');
+        Route::post('/', [\App\Http\Controllers\LeaveController::class, 'store'])->name('user.cuti.store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\LeaveController::class, 'edit'])->name('user.cuti.edit');
+        Route::put('/{id}', [\App\Http\Controllers\LeaveController::class, 'update'])->name('user.cuti.update');
+        Route::delete('/{id}', [\App\Http\Controllers\LeaveController::class, 'destroy'])->name('user.cuti.destroy');
+        Route::get('/{id}/print', [\App\Http\Controllers\LeaveController::class, 'print'])->name('user.cuti.print');
+    });
     
     // Rute Pimpinan
     Route::group(['prefix' => 'pimpinan'], function () {
@@ -33,6 +46,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/history', [\App\Http\Controllers\PimpinanController::class, 'history'])->name('pimpinan.history');
         Route::patch('/approve/{id}', [\App\Http\Controllers\PimpinanController::class, 'approve'])->name('pimpinan.approve');
         Route::patch('/reject/{id}', [\App\Http\Controllers\PimpinanController::class, 'reject'])->name('pimpinan.reject');
+        Route::patch('/bulk-approve', [\App\Http\Controllers\PimpinanController::class, 'bulkApprove'])->name('pimpinan.bulk_approve');
+
+        // Rute Cuti Pimpinan
+        Route::group(['prefix' => 'cuti'], function () {
+            Route::get('/approvals', [\App\Http\Controllers\PimpinanLeaveController::class, 'approvals'])->name('pimpinan.cuti.approvals');
+            Route::get('/history', [\App\Http\Controllers\PimpinanLeaveController::class, 'history'])->name('pimpinan.cuti.history');
+            Route::patch('/approve/{id}', [\App\Http\Controllers\PimpinanLeaveController::class, 'approve'])->name('pimpinan.cuti.approve');
+            Route::patch('/reject/{id}', [\App\Http\Controllers\PimpinanLeaveController::class, 'reject'])->name('pimpinan.cuti.reject');
+            Route::patch('/bulk-approve', [\App\Http\Controllers\PimpinanLeaveController::class, 'bulkApprove'])->name('pimpinan.cuti.bulk_approve');
+        });
     });
 
     // Rute admin (dashboard & approval) 
@@ -46,6 +69,15 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/force-approve/{id}', [AdminController::class, 'forceApprove'])->name('admin.force_approve');
         Route::patch('/reject/{id}', [AdminController::class, 'reject'])->name('admin.reject');
         Route::delete('/overtimes/{id}', [AdminController::class, 'destroyOvertime'])->name('admin.overtimes.destroy');
+        
+        // Rute Cuti Admin
+        Route::group(['prefix' => 'cuti'], function () {
+            Route::get('/', [\App\Http\Controllers\AdminLeaveController::class, 'index'])->name('admin.cuti.index');
+            Route::patch('/approve/{id}', [\App\Http\Controllers\AdminLeaveController::class, 'approve'])->name('admin.cuti.approve');
+            Route::patch('/reject/{id}', [\App\Http\Controllers\AdminLeaveController::class, 'reject'])->name('admin.cuti.reject');
+            Route::patch('/force-approve/{id}', [\App\Http\Controllers\AdminLeaveController::class, 'forceApprove'])->name('admin.cuti.force_approve');
+            Route::delete('/{id}', [\App\Http\Controllers\AdminLeaveController::class, 'destroy'])->name('admin.cuti.destroy');
+        });
         
         // Manajemen Pengguna
         Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('admin.users.index');

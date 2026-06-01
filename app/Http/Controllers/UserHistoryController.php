@@ -27,7 +27,21 @@ class UserHistoryController extends Controller
         $labels = $chartData->pluck('month')->toArray();
         $data = $chartData->map(fn($item) => round($item->total))->toArray();
 
-        return view('user.dashboard', compact('totalApproved', 'totalWaiting', 'totalRejected', 'labels', 'data'));
+        // Cuti (Leave) Stats
+        $usedLeave = \App\Models\Leave::where('user_id', $userId)
+            ->where('status', 'approved')
+            ->sum('total_hari');
+        $sisaCuti = max(0, 12 - $usedLeave);
+
+        return view('user.dashboard', compact(
+            'totalApproved', 
+            'totalWaiting', 
+            'totalRejected', 
+            'labels', 
+            'data',
+            'usedLeave',
+            'sisaCuti'
+        ));
     }
 
     public function index(Request $request)
