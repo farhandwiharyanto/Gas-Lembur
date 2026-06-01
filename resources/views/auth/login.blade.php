@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - {{ config('app.name', 'Gas-Lembur') }}</title>
+    <title>Login - {{ config('app.name', 'Portal Lembur IT') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="{{ asset('images/logo-gas-lembur.png') }}" type="image/png">
     <style>
@@ -21,7 +21,7 @@
         <div class="inline-flex p-4 rounded-3xl bg-white/5 border border-white/10 shadow-2xl mb-6 transition-transform duration-500 group-hover:scale-110">
             <img src="{{ asset('images/logo-gas-lembur.png') }}" alt="Logo" class="h-20 w-20 object-contain brightness-110">
         </div>
-        <h1 class="text-4xl font-extrabold text-white tracking-tight font-outfit uppercase">GAS-LEMBUR</h1>
+        <h1 class="text-4xl font-extrabold text-white tracking-tight font-outfit uppercase">Portal Lembur IT</h1>
         <p class="text-slate-400 mt-2 text-sm font-medium tracking-wide uppercase opacity-70">Sistem Informasi Lembur Karyawan</p>
     </div>
 
@@ -78,7 +78,7 @@
 
     <!-- Footer Area -->
     <div class="mt-12 text-center">
-        <p class="text-slate-500 text-xs font-medium uppercase tracking-[0.2em]">&copy; 2026 Gas-Lembur Portal</p>
+        <p class="text-slate-500 text-xs font-medium uppercase tracking-[0.1em]">&copy; {{ date('Y') }} Portal Lembur IT | Create By: Farhan Dwi Haryanto <span class="text-rose-500">❤️</span></p>
     </div>
 </div>
 
