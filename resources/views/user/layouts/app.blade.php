@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'Gas-Lembur') }} - Persetujuan Lembur</title>
+    <title>{{ config('app.name', 'Portal Lembur IT') }} - Persetujuan Lembur</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="{{ asset('images/logo-gas-lembur.png') }}" type="image/png">
@@ -27,7 +27,7 @@
             <div class="flex items-center space-x-3">
                 <img src="{{ asset('images/logo-gas-lembur.png') }}" alt="Logo" class="h-10 w-10 object-contain brightness-110 shadow-lg p-1 bg-white/5 rounded-lg">
                 <div class="flex flex-col">
-                    <span class="text-xl font-bold text-white tracking-tight font-outfit uppercase">GAS-LEMBUR</span>
+                    <span class="text-xl font-bold text-white tracking-tight font-outfit uppercase">PORTAL LEMBUR IT</span>
                     <span class="text-[10px] text-indigo-400 font-bold tracking-[0.2em] -mt-1 opacity-80">EMPLOYEE PORTAL</span>
                 </div>
             </div>
@@ -123,7 +123,7 @@
         <header class="bg-slate-900 shadow-lg h-16 flex items-center justify-between px-4 z-10 md:hidden text-white border-b border-slate-800">
             <div class="flex items-center space-x-2">
                 <img src="{{ asset('images/logo-gas-lembur.png') }}" alt="Logo" class="h-8 w-8 object-contain brightness-110">
-                <span class="text-base font-bold text-white tracking-tight uppercase font-outfit">GAS-LEMBUR</span>
+                <span class="text-base font-bold text-white tracking-tight uppercase font-outfit">PORTAL LEMBUR IT</span>
             </div>
             <!-- Mobile Menu Button (Hamburger) -->
             <button @click="isMobileMenuOpen = !isMobileMenuOpen" class="p-2 rounded-md hover:bg-slate-800 transition-colors">
@@ -147,6 +147,13 @@
                 @endif
 
                 @yield('content')
+                
+                <!-- Premium Footer -->
+                <footer class="mt-12 py-6 border-t border-slate-200/50 text-center">
+                    <p class="text-xs text-slate-400 font-bold tracking-wider uppercase">
+                        &copy; {{ date('Y') }} Portal Lembur IT | Create By: Farhan Dwi Haryanto <span class="text-rose-500">❤️</span>
+                    </p>
+                </footer>
             </div>
         </main>
     </div>

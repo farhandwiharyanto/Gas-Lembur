@@ -1,59 +1,91 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏢 Portal Lembur IT
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Laravel Version](https://img.shields.io/badge/Laravel-v11.x-red.svg)](https://laravel.com)
+[![PHP Version](https://img.shields.io/badge/PHP-v8.2+-blue.svg)](https://php.net)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v3.x-38bdf8.svg)](https://tailwindcss.com)
+[![Docker](https://img.shields.io/badge/Docker-Supported-blue.svg)](https://www.docker.com)
 
-## About Laravel
+**Portal Lembur IT** (sebelumnya Gas-Lembur) adalah sebuah platform web portal perusahaan premium tingkat tinggi yang dirancang khusus untuk mengelola pengajuan lembur dan cuti karyawan secara efisien. Menggunakan arsitektur modern berbasis Laravel, Tailwind CSS, Alpine.js, Chart.js, dan DomPDF.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ Fitur Utama (Key Features)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 📊 1. Multi-role Premium Dashboards
+Sistem mendeteksi peran pengguna secara otomatis saat login dan mengarahkannya ke dashboard masing-masing yang interaktif dan kaya visualisasi data:
+* **Dashboard Karyawan**: Menampilkan metrik Jam Lembur (Disetujui/Menunggu) serta Saldo Cuti aktif (Kuota 12 hari per tahun). Dilengkapi grafik intensitas lembur 6 bulan terakhir (*Line Chart*) dan statistik cuti melingkar (*Doughnut Gauge Chart*).
+* **Dashboard Pimpinan (Pak Erwin)**: Menampilkan total operasional lembur dan cuti seluruh anggota departemennya beserta grafik Top 10 Karyawan dengan jam lembur dan cuti terlama.
+* **Dashboard System Administrator**: Menampilkan ringkasan data komprehensif tingkat perusahaan, daftar Top 5 operasional, serta grafik jumlah lembur & cuti per bagian di seluruh perusahaan.
 
-## Learning Laravel
+### 📅 2. Sistem Manajemen Cuti Terintegrasi (Cuti 2026)
+* Pembatasan kuota cuti tahunan otomatis sebanyak **12 Hari**.
+* Integrasi **Kalender Cuti Bersama & Libur Perusahaan 2026** (16 hari libur nasional + cuti bersama libur perusahaan).
+* Pengurangan kuota yang adil karena sistem otomatis melompati akhir pekan dan libur nasional di atas saat pengajuan.
+* Formulir Cuti cetak PDF premium yang berorientasi **A4 Portrait** dengan penempatan konten sejajar, tanda tangan digital (karyawan & pimpinan), dan pencetakan otomatis tanggal masuk kerja kembali secara dinamis.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### ⏰ 3. Manajemen Lembur (Overtime)
+* Pengisian formulir lembur terstruktur dengan validasi waktu masuk dan keluar.
+* Rekapitulasi lemburan bulanan karyawan yang dapat diunduh secara bulk (massal) dalam format PDF profesional.
+* Halaman Perhitungan Lembur dengan tabel ringkas yang memiliki footer kalkulasi total jam lembur yang sejajar presisi di sisi kanan.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🧭 4. Navigasi Sidebar 4-Menu Responsif
+Seluruh peran pengguna diselaraskan untuk memiliki navigasi modern yang kompak, hanya menampilkan 4 menu induk yang bisa di-collapse/expand dengan animasi panah rotasi halus menggunakan **Alpine.js**:
+1. **Dashboard**
+2. **Lembur** (Input Lembur, Riwayat Lembur, Perhitungan Lembur)
+3. **Cuti** (Input Cuti, Riwayat Cuti, Dashboard Cuti)
+4. **Profil Karyawan** (Manajemen Tanda Tangan & Data Pengguna)
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🛠️ Tech Stack
+* **Framework**: Laravel 11.x (PHP 8.2+)
+* **Styling**: Tailwind CSS & Vanilla Custom CSS
+* **Frontend Interactivity**: Alpine.js (State management & animations)
+* **Visualization**: Chart.js (Line, Bar, and Doughnut charts)
+* **PDF Engine**: Barryvdh DomPDF (High-fidelity corporate prints)
+* **Database**: PostgreSQL / PgSQL
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## ⚙️ Cara Menjalankan Aplikasi (Setup & Run)
 
-## Contributing
+Proyek ini terbagi menjadi 2 branch utama di GitHub:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### A. Branch `main` (Dengan Docker Container) 🐳
+Gunakan branch ini jika Anda ingin menjalankan aplikasi di dalam container terisolasi yang sudah dikonfigurasi lengkap (Nginx, PHP, Node.js/Vite, PostgreSQL, Adminer).
+1. Pastikan Docker Desktop sudah aktif di komputer Anda.
+2. Jalankan perintah di bawah untuk mengaktifkan seluruh container:
+   ```bash
+   docker-compose up -d --build
+   ```
+3. Buka browser dan akses portal pada:
+   * **Web Application**: `http://localhost:8001`
+   * **Adminer (Database Monitoring)**: `http://localhost:8083`
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### B. Branch `Tanpa-Docker` (Sistem Lokal Murni) 💻
+Gunakan branch ini jika Anda ingin menjalankan server menggunakan PHP lokal di Mac/Windows Anda.
+1. Pastikan database PostgreSQL lokal Anda sudah aktif dan sesuaikan konfigurasi koneksinya di berkas `.env`.
+2. Aktifkan server PHP Laravel:
+   ```bash
+   php artisan serve
+   ```
+   * Aplikasi dapat diakses pada: `http://127.0.0.1:8000`
+3. Buka tab terminal baru untuk menjalankan kompilasi asset visual menggunakan Vite:
+   ```bash
+   npm run dev
+   ```
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🔒 Akun Uji Coba (Testing Accounts)
+* **System Administrator**: username `adm` | password `password`
+* **Pimpinan (Erwin Setiawan)**: username `ese` | password `password`
+* **Karyawan (Farhan Dwi Haryanto)**: username `fwy` | password `password`
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## ✍️ Credits & Creator
+Dibuat dengan sepenuh hati oleh **Farhan Dwi Haryanto** ❤️  
+*(Disempurnakan bersama Sepuh AI 🤖)*
