@@ -28,5 +28,6 @@
         "QUEUE_CONNECTION": "sync",
         "VIEW_COMPILED_PATH": "/tmp",
         "LOG_CHANNEL": "stderr"
-    }
+    },
+    "outputDirectory": "public"
 }
