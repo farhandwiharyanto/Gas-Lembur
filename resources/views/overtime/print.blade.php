@@ -244,6 +244,7 @@
         $resolvePath = function ($path) {
             if (!$path)
                 return null;
+            if (str_starts_with($path, 'data:')) return $path;
             // Jika path dimulai dengan /uploads, ambil dari public directory
             if (str_starts_with($path, '/uploads')) {
                 $fullPath = public_path($path);

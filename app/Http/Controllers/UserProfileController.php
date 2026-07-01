@@ -33,9 +33,9 @@ class UserProfileController extends Controller
 
         if ($request->hasFile('tanda_tangan')) {
             $file = $request->file('tanda_tangan');
-            $filename = 'signature_' . time() . '_' . $user->id . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/signatures'), $filename);
-            $signatureData = '/uploads/signatures/' . $filename;
+            $mimeType = $file->getClientMimeType();
+            $base64Image = base64_encode(file_get_contents($file->getRealPath()));
+            $signatureData = 'data:' . $mimeType . ';base64,' . $base64Image;
         }
 
         $user->update([
