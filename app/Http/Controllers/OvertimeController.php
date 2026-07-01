@@ -26,7 +26,7 @@ class OvertimeController extends Controller
             'jam_masuk' => 'required',
             'jam_keluar' => 'required',
             'total_jam' => 'required|string',
-            'nomor_tiket' => 'required|string|max:100',
+            'nomor_tiket' => 'nullable|string|max:100',
             'pemberi_lembur' => 'required|string|max:255',
         ]);
 
@@ -92,7 +92,7 @@ class OvertimeController extends Controller
             'jam_masuk' => 'required',
             'jam_keluar' => 'required',
             'total_jam' => 'required|string',
-            'nomor_tiket' => 'required|string|max:100',
+            'nomor_tiket' => 'nullable|string|max:100',
             'pemberi_lembur' => 'required|string|max:255',
         ]);
 

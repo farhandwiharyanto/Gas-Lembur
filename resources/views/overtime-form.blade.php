@@ -109,8 +109,8 @@
                 </div>
                 <div class="hidden md:block"></div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Nomor Tiket</label>
-                    <input type="text" name="nomor_tiket" value="{{ old('nomor_tiket', $overtime->nomor_tiket ?? '') }}" required placeholder="Contoh: INC001122"
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Nomor Tiket <span class="text-xs text-slate-400 font-normal ml-1">(Opsional)</span></label>
+                    <input type="text" name="nomor_tiket" value="{{ old('nomor_tiket', $overtime->nomor_tiket ?? '') }}" placeholder="Contoh: INC001122"
                         class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder-slate-400">
                 </div>
                 <div>
