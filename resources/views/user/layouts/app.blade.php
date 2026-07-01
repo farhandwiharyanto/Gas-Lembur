@@ -84,7 +84,23 @@
                 </div>
             </div>
 
-            <!-- 4. Profil Karyawan -->
+            <!-- 4. Utilitas Dropdown -->
+            <div x-data="{ open: {{ request()->routeIs('utility.*') ? 'true' : 'false' }} }" class="space-y-1">
+                <button @click="open = !open" class="w-full flex items-center justify-between px-4 py-3 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors text-slate-100 {{ request()->routeIs('utility.*') ? 'bg-indigo-900/40 text-indigo-400 font-bold border-l-4 border-indigo-500' : '' }}">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('utility.*') ? 'text-indigo-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span>Utilitas</span>
+                    </div>
+                    <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-90': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <div x-show="open" x-cloak class="pl-6 space-y-1 mt-1 transition-all duration-300">
+                    <a href="{{ route('utility.split-pdf') }}" class="flex items-center px-4 py-2 text-xs {{ request()->routeIs('utility.split-pdf') ? 'bg-indigo-600 text-white font-bold' : 'text-slate-300 hover:bg-indigo-800' }} rounded-md transition-colors">
+                        Split PDF
+                    </a>
+                </div>
+            </div>
+
+            <!-- 5. Profil Karyawan -->
             <a href="{{ route('user.profile.edit') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('user.profile.*') ? 'bg-indigo-600 text-white font-bold' : 'hover:bg-indigo-800 hover:text-white' }} rounded-lg transition-colors">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 Profil Karyawan
