@@ -231,6 +231,7 @@
             @php
                 $resolvePath = function($path) {
                     if (!$path) return null;
+                    if (str_starts_with($path, 'data:')) return $path;
                     if (str_starts_with($path, '/uploads')) {
                         $fullPath = public_path($path);
                     } else {
