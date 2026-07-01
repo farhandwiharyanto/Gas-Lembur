@@ -5,7 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
     image: gas-lembur-app
-    container_name: gas-lembur-app
     restart: unless-stopped
     tty: true
     environment:
@@ -19,7 +18,6 @@ services:
   # Nginx Service
   web:
     image: nginx:alpine
-    container_name: gas-lembur-web
     restart: unless-stopped
     ports:
       - "8001:80"
@@ -32,7 +30,6 @@ services:
   # Vite Service (Node.js)
   vite:
     image: node:20-alpine
-    container_name: gas-lembur-vite
     restart: unless-stopped
     working_dir: /var/www
     ports:
@@ -47,7 +44,6 @@ services:
   # Database Service (PostgreSQL)
   postgresql:
     image: postgres:16-alpine
-    container_name: gas-lembur-db
     restart: unless-stopped
     tty: true
     ports:
@@ -64,7 +60,6 @@ services:
   # Adminer (Monitoring)
   adminer:
     image: adminer
-    container_name: gas-lembur-adminer
     restart: unless-stopped
     ports:
       - "8083:8080"
@@ -77,4 +72,5 @@ networks:
 
 volumes:
   gas-lembur-db-data:
-    driver: local
+    external: true
+    name: gas-lembur_gas-lembur-db-data

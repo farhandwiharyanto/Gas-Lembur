@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OvertimeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PdfUtilityController;
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
@@ -89,5 +90,11 @@ Route::middleware(['auth'])->group(function () {
         // Laporan & Export
         Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('admin.reports.index');
         Route::get('/reports/export', [\App\Http\Controllers\ReportController::class, 'export'])->name('admin.reports.export');
+    });
+
+    // Utilitas (bisa diakses user & admin)
+    Route::group(['prefix' => 'utility'], function () {
+        Route::get('/split-pdf', [PdfUtilityController::class, 'index'])->name('utility.split-pdf');
+        Route::post('/split-pdf', [PdfUtilityController::class, 'split'])->name('utility.split-pdf.process');
     });
 });
