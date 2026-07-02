@@ -30,16 +30,8 @@ class OvertimeController extends Controller
             'pemberi_lembur' => 'required|string|max:255',
         ]);
 
-        $fileName = null;
-        if (str_contains($validated['tanda_tangan'], ';base64,')) {
-            $image_parts = explode(";base64,", $validated['tanda_tangan']);
-            $image_base64 = base64_decode($image_parts[1]);
-            $fileName = 'signatures/' . Str::uuid() . '.png';
-            Storage::disk('public')->put($fileName, $image_base64);
-        } else {
-            // Already a path or normal string
-            $fileName = $validated['tanda_tangan'];
-        }
+        // Save the base64 string or path directly to the database
+        $fileName = $validated['tanda_tangan'];
 
         Overtime::create([
             'employee_name' => $user->name,
@@ -96,15 +88,7 @@ class OvertimeController extends Controller
             'pemberi_lembur' => 'required|string|max:255',
         ]);
 
-        $fileName = $overtime->tanda_tangan;
-        if (str_contains($validated['tanda_tangan'], ';base64,')) {
-            $image_parts = explode(";base64,", $validated['tanda_tangan']);
-            $image_base64 = base64_decode($image_parts[1]);
-            $fileName = 'signatures/' . Str::uuid() . '.png';
-            Storage::disk('public')->put($fileName, $image_base64);
-        } else {
-            $fileName = $validated['tanda_tangan'];
-        }
+        $fileName = $validated['tanda_tangan'] ?? $overtime->tanda_tangan;
 
         $overtime->update([
             'nama_lemburan' => $validated['nama_lemburan'],
